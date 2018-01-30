@@ -1,0 +1,60 @@
+package com.github.jnuutinen.cookbook;
+
+
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
+
+import com.github.jnuutinen.cookbook.data.db.AppDatabase;
+import com.github.jnuutinen.cookbook.data.db.entity.CategoryEntity;
+import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+
+import java.util.List;
+
+public class DataRepository {
+    private static DataRepository instance;
+
+    private final AppDatabase appDatabase;
+    private MediatorLiveData<List<RecipeEntity>> observableRecipes;
+    private MediatorLiveData<List<CategoryEntity>> observableCategories;
+
+    private DataRepository(final AppDatabase appDatabase) {
+        this.appDatabase = appDatabase;
+        observableRecipes = new MediatorLiveData<>();
+        observableCategories = new MediatorLiveData<>();
+        observableRecipes.addSource(appDatabase.recipeDao().getAll(),
+                recipeEntities -> {
+                    if (appDatabase.getDatabaseCreated().getValue() != null) {
+                        observableRecipes.postValue(recipeEntities);
+                    }
+                });
+        observableCategories.addSource(appDatabase.categoryDao().getAll(),
+                categoryEntities -> {
+                    if (appDatabase.getDatabaseCreated().getValue() != null) {
+                        observableCategories.postValue(categoryEntities);
+                    }
+                });
+    }
+
+    public static DataRepository getInstance(final AppDatabase appDatabase) {
+        if (instance == null) {
+            synchronized (DataRepository.class) {
+                if (instance == null) {
+                    instance = new DataRepository(appDatabase);
+                }
+            }
+        }
+        return instance;
+    }
+
+    public LiveData<List<RecipeEntity>> getRecipes() {
+        return observableRecipes;
+    }
+
+    public LiveData<List<CategoryEntity>> getCategories() {
+        return observableCategories;
+    }
+
+    public void saveRecipe(RecipeEntity recipe) {
+        appDatabase.insertRecipe(recipe);
+    }
+}

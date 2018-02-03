@@ -8,30 +8,30 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
 @Dao
 public interface RecipeDao {
-    @Query("SELECT * FROM RecipeEntity")
-    LiveData<List<RecipeEntity>> getAll();
+    @Query("SELECT * FROM Recipe")
+    LiveData<List<Recipe>> getAll();
 
-    @Query("SELECT * FROM RecipeEntity WHERE id = :id LIMIT 1")
-    LiveData<RecipeEntity> getById(int id);
+    @Query("SELECT * FROM Recipe WHERE id = :id LIMIT 1")
+    LiveData<Recipe> getById(int id);
 
-    @Query("SELECT * FROM RecipeEntity WHERE name = :name")
-    LiveData<List<RecipeEntity>> getAllByName(String name);
+    @Query("SELECT * FROM Recipe WHERE name = :name")
+    LiveData<List<Recipe>> getAllByName(String name);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void update(RecipeEntity recipeEntity);
+    void update(Recipe recipe);
 
     @Insert
-    void insert(RecipeEntity recipeEntity);
+    void insert(Recipe recipe);
 
     @Insert
-    void insertAll(List<RecipeEntity> recipeEntities);
+    void insertAll(List<Recipe> recipeEntities);
 
     @Delete
-    void delete(RecipeEntity recipeEntity);
+    void delete(Recipe recipe);
 }

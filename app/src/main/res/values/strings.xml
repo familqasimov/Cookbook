@@ -12,4 +12,7 @@
     <string name="contentdesc_remove_ingredient">Remove ingredient button</string>
     <string name="recipe_instructions">Instructions</string>
     <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="create_recipe_cancel">Discard changes?</string>
+    <string name="yes">Yes</string>
 </resources>

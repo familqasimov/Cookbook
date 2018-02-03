@@ -11,15 +11,15 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.github.jnuutinen.cookbook.AppExecutors;
-import com.github.jnuutinen.cookbook.data.db.dao.CategoryDao;
-import com.github.jnuutinen.cookbook.data.db.entity.CategoryEntity;
 import com.github.jnuutinen.cookbook.data.db.converter.ListConverter;
+import com.github.jnuutinen.cookbook.data.db.dao.CategoryDao;
 import com.github.jnuutinen.cookbook.data.db.dao.RecipeDao;
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
-@Database(entities = {RecipeEntity.class, CategoryEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {Recipe.class, Category.class}, version = 1, exportSchema = false)
 @TypeConverters({ListConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DB_NAME = "cookbook_db";
@@ -45,6 +45,15 @@ public abstract class AppDatabase extends RoomDatabase {
         return instance;
     }
 
+    public LiveData<Boolean> getDatabaseCreated() {
+        return isDatabaseCreated;
+    }
+
+    public static void insertRecipe(final Recipe recipe) {
+        executors.diskIo().execute(() -> instance.runInTransaction(() ->
+                instance.recipeDao().insert(recipe)));
+    }
+
     private static AppDatabase buildDatabase(final Context appContext) {
         return Room.databaseBuilder(appContext, AppDatabase.class, DB_NAME)
                 .addCallback(new Callback() {
@@ -53,8 +62,8 @@ public abstract class AppDatabase extends RoomDatabase {
                         super.onCreate(db);
                         executors.diskIo().execute(() -> {
                             AppDatabase database = AppDatabase.getInstance(appContext, executors);
-                            List<CategoryEntity> categories = DataGenerator.generateCategories();
-                            List<RecipeEntity> recipes = DataGenerator.generateRecipes();
+                            List<Category> categories = DataGenerator.generateCategories();
+                            List<Recipe> recipes = DataGenerator.generateRecipes();
                             insertData(database, categories, recipes);
                             database.setDatabaseCreated();
                         });
@@ -73,23 +82,11 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     private static void insertData(final AppDatabase database,
-                                   final List<CategoryEntity> categories,
-                                   final List<RecipeEntity> recipes) {
+                                   final List<Category> categories,
+                                   final List<Recipe> recipes) {
         database.runInTransaction(() -> {
             database.categoryDao().insertAll(categories);
             database.recipeDao().insertAll(recipes);
-        });
-    }
-
-    public LiveData<Boolean> getDatabaseCreated() {
-        return isDatabaseCreated;
-    }
-
-    public static void insertRecipe(final RecipeEntity recipe) {
-        executors.diskIo().execute(() -> {
-            instance.runInTransaction(() -> {
-                instance.recipeDao().insert(recipe);
-            });
         });
     }
 }

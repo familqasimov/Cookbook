@@ -4,34 +4,30 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
-import com.github.jnuutinen.cookbook.data.model.Category;
-
 @Entity
-public class CategoryEntity implements Category {
+public class Category {
     @PrimaryKey(autoGenerate = true)
     private Integer id;
 
     private String name;
 
-    public CategoryEntity() {
+    public Category() {
     }
 
     @Ignore
-    public CategoryEntity(String name) {
+    public Category(String name) {
         this.name = name;
     }
 
-    @Override
     public Integer getId() {
         return id;
     }
 
-    @Override
+    public void setId(Integer id) { this.id = id; }
+
     public String getName() {
         return name;
     }
-
-    public void setId(Integer id) { this.id = id; }
 
     public void setName(String name) {
         this.name = name;

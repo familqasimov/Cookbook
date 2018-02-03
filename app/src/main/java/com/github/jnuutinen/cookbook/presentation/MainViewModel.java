@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook;
+package com.github.jnuutinen.cookbook.presentation;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -6,35 +6,36 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.support.annotation.NonNull;
 
-import com.github.jnuutinen.cookbook.data.db.entity.CategoryEntity;
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+import com.github.jnuutinen.cookbook.CookbookApp;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
 
 public class MainViewModel extends AndroidViewModel {
-    private final MediatorLiveData<List<RecipeEntity>> observableRecipes;
-    private final MediatorLiveData<List<CategoryEntity>> observableCategories;
-    private final App application;
+    private final MediatorLiveData<List<Recipe>> observableRecipes;
+    private final MediatorLiveData<List<Category>> observableCategories;
+    private final CookbookApp application;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
-        this.application = (App) application;
+        this.application = (CookbookApp) application;
         observableRecipes = new MediatorLiveData<>();
         //observableRecipes.setValue(null);
         observableCategories = new MediatorLiveData<>();
         //observableCategories.setValue(null);
-        LiveData<List<RecipeEntity>> recipes = ((this.application).getRepository().getRecipes());
+        LiveData<List<Recipe>> recipes = ((this.application).getRepository().getRecipes());
         observableRecipes.addSource(recipes, observableRecipes::setValue);
-        LiveData<List<CategoryEntity>> categories = (this.application).getRepository().getCategories();
+        LiveData<List<Category>> categories = (this.application).getRepository().getCategories();
         observableCategories.addSource(categories, observableCategories::setValue);
     }
 
-    public LiveData<List<RecipeEntity>> getRecipes() {
+    public LiveData<List<Recipe>> getRecipes() {
         return observableRecipes;
     }
 
-    public LiveData<List<CategoryEntity>> getCategories() {
+    public LiveData<List<Category>> getCategories() {
         return observableCategories;
     }
 }

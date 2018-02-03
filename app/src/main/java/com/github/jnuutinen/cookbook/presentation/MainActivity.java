@@ -3,19 +3,13 @@ package com.github.jnuutinen.cookbook.presentation;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import com.github.jnuutinen.cookbook.MainViewModel;
 import com.github.jnuutinen.cookbook.R;
-import com.github.jnuutinen.cookbook.RecipeAdapter;
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

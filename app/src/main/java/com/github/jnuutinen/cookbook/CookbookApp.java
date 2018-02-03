@@ -2,9 +2,10 @@ package com.github.jnuutinen.cookbook;
 
 import android.app.Application;
 
+import com.github.jnuutinen.cookbook.data.DataRepository;
 import com.github.jnuutinen.cookbook.data.db.AppDatabase;
 
-public class App extends Application {
+public class CookbookApp extends Application {
     private AppExecutors appExecutors;
 
     @Override

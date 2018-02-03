@@ -14,9 +14,8 @@ import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
-import com.github.jnuutinen.cookbook.CreateRecipeViewModel;
 import com.github.jnuutinen.cookbook.R;
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.ArrayList;
 
@@ -24,6 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class CreateRecipeActivity extends AppCompatActivity {
+    //private static final String TAG = CreateRecipeActivity.class.getSimpleName();
 
     @BindView(R.id.table_ingredients) TableLayout table;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -31,6 +31,10 @@ public class CreateRecipeActivity extends AppCompatActivity {
     @BindView(R.id.edit_instructions) EditText editTextInstructions;
 
     private CreateRecipeViewModel viewModel;
+    private ArrayList<String> ingredients;
+    private Integer categoryId;
+    private String name;
+    private String instructions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +67,16 @@ public class CreateRecipeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void newRow() {
+    public void newRow(View view) {
+        newRow();
+    }
+
+    public void removeRow(View view) {
+        int numberOfRows = table.getChildCount();
+        if (numberOfRows > 1) table.removeViewAt(numberOfRows - 1);
+    }
+
+    private void newRow() {
         TableRow row = new TableRow(this);
         TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
         lp.setMargins(16, 16, 16, 16);
@@ -77,20 +90,11 @@ public class CreateRecipeActivity extends AppCompatActivity {
         table.addView(row);
     }
 
-    public void newRow(View view) {
-        newRow();
-    }
-
-    public void removeRow(View view) {
-        int numberOfRows = table.getChildCount();
-        if (numberOfRows > 1) table.removeViewAt(numberOfRows - 1);
-    }
-
-    public void saveRecipe() {
-        ArrayList<String> ingredients = new ArrayList<>();
-        Integer categoryId = null; // TODO: categoryId
-        String name = editTextName.getText().toString().trim();
-        String instructions = editTextInstructions.getText().toString().trim();
+    private void getRecipeInfo() {
+        ingredients = new ArrayList<>();
+        categoryId = null; // TODO: categoryId
+        name = editTextName.getText().toString().trim();
+        instructions = editTextInstructions.getText().toString().trim();
         for (int i = 0; i < table.getChildCount(); i++) {
             View view = table.getChildAt(i);
             TableRow row = (TableRow) view;
@@ -99,7 +103,11 @@ public class CreateRecipeActivity extends AppCompatActivity {
             }
             ingredients.add(((EditText) row.getChildAt(0)).getText().toString().trim());
         }
-        RecipeEntity recipe = new RecipeEntity(name, categoryId, ingredients, instructions);
+    }
+
+    private void saveRecipe() {
+        getRecipeInfo();
+        Recipe recipe = new Recipe(name, categoryId, ingredients, instructions);
         viewModel.insertRecipe(recipe);
         setResult(RESULT_OK, new Intent());
     }

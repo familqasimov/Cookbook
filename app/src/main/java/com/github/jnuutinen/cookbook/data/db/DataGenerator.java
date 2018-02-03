@@ -1,8 +1,8 @@
 package com.github.jnuutinen.cookbook.data.db;
 
 
-import com.github.jnuutinen.cookbook.data.db.entity.CategoryEntity;
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +21,10 @@ public class DataGenerator {
     private static final String[] CATEGORY_NAME = new String[] {
             "Category1", "Category2", "Category3", "Category4"};
 
-    public static List<RecipeEntity> generateRecipes() {
-        List<RecipeEntity> recipes = new ArrayList<>(RECIPE_NAME.length);
+    public static List<Recipe> generateRecipes() {
+        List<Recipe> recipes = new ArrayList<>(RECIPE_NAME.length);
         for (int i = 0; i < RECIPE_NAME.length; i++) {
-            RecipeEntity recipe = new RecipeEntity();
+            Recipe recipe = new Recipe();
             recipe.setName(RECIPE_NAME[i]);
             recipe.setCategoryId(null);
             recipe.setInstructions(RECIPE_INSTRUCTIONS[i]);
@@ -38,10 +38,10 @@ public class DataGenerator {
         return recipes;
     }
 
-    public static List<CategoryEntity> generateCategories() {
-        List<CategoryEntity> categories = new ArrayList<>(CATEGORY_NAME.length);
+    public static List<Category> generateCategories() {
+        List<Category> categories = new ArrayList<>(CATEGORY_NAME.length);
         for (int i = 0; i < CATEGORY_NAME.length; i++) {
-            categories.add(new CategoryEntity(CATEGORY_NAME[i]));
+            categories.add(new Category(CATEGORY_NAME[i]));
         }
         return categories;
     }

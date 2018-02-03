@@ -1,12 +1,12 @@
-package com.github.jnuutinen.cookbook;
+package com.github.jnuutinen.cookbook.data;
 
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 
 import com.github.jnuutinen.cookbook.data.db.AppDatabase;
-import com.github.jnuutinen.cookbook.data.db.entity.CategoryEntity;
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
@@ -14,8 +14,8 @@ public class DataRepository {
     private static DataRepository instance;
 
     private final AppDatabase appDatabase;
-    private MediatorLiveData<List<RecipeEntity>> observableRecipes;
-    private MediatorLiveData<List<CategoryEntity>> observableCategories;
+    private MediatorLiveData<List<Recipe>> observableRecipes;
+    private MediatorLiveData<List<Category>> observableCategories;
 
     private DataRepository(final AppDatabase appDatabase) {
         this.appDatabase = appDatabase;
@@ -46,15 +46,15 @@ public class DataRepository {
         return instance;
     }
 
-    public LiveData<List<RecipeEntity>> getRecipes() {
+    public LiveData<List<Recipe>> getRecipes() {
         return observableRecipes;
     }
 
-    public LiveData<List<CategoryEntity>> getCategories() {
+    public LiveData<List<Category>> getCategories() {
         return observableCategories;
     }
 
-    public void saveRecipe(RecipeEntity recipe) {
-        appDatabase.insertRecipe(recipe);
+    public void saveRecipe(Recipe recipe) {
+        instance.appDatabase.insertRecipe(recipe);
     }
 }

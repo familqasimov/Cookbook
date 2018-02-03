@@ -8,30 +8,30 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.github.jnuutinen.cookbook.data.db.entity.CategoryEntity;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
 
 import java.util.List;
 
 @Dao
 public interface CategoryDao {
-    @Query("SELECT * FROM CategoryEntity")
-    LiveData<List<CategoryEntity>> getAll();
+    @Query("SELECT * FROM Category")
+    LiveData<List<Category>> getAll();
 
-    @Query("SELECT * FROM CategoryEntity WHERE id = :id LIMIT 1")
-    LiveData<CategoryEntity> getById(int id);
+    @Query("SELECT * FROM Category WHERE id = :id LIMIT 1")
+    LiveData<Category> getById(int id);
 
-    @Query("SELECT * FROM CategoryEntity WHERE name = :name LIMIT 1")
-    LiveData<CategoryEntity> getByName(String name);
+    @Query("SELECT * FROM Category WHERE name = :name LIMIT 1")
+    LiveData<Category> getByName(String name);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void update(CategoryEntity categoryEntity);
+    void update(Category category);
 
     @Insert
-    void insert(CategoryEntity categoryEntity);
+    void insert(Category category);
 
     @Insert
-    void insertAll(List<CategoryEntity> categoryEntities);
+    void insertAll(List<Category> categoryEntities);
 
     @Delete
-    void delete(CategoryEntity categoryEntity);
+    void delete(Category category);
 }

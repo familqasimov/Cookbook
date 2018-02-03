@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook;
+package com.github.jnuutinen.cookbook.presentation;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -8,11 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+import com.github.jnuutinen.cookbook.R;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
-public class RecipeAdapter extends ArrayAdapter<RecipeEntity> {
+public class RecipeAdapter extends ArrayAdapter<Recipe> {
 
     // View lookup cache
     private static class ViewHolder {
@@ -20,7 +21,7 @@ public class RecipeAdapter extends ArrayAdapter<RecipeEntity> {
         TextView category;
     }
 
-    public RecipeAdapter(Context context, List<RecipeEntity> recipes) {
+    public RecipeAdapter(Context context, List<Recipe> recipes) {
         super(context, 0, recipes);
     }
 
@@ -29,7 +30,7 @@ public class RecipeAdapter extends ArrayAdapter<RecipeEntity> {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         // Get recipe item for this position
-        RecipeEntity recipe = getItem(position);
+        Recipe recipe = getItem(position);
 
         // Check if an existing view is being reused, otherwise inflate view
         ViewHolder viewHolder; // view lookup cache stored in tag

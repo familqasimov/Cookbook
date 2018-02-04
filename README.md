@@ -1,6 +1,10 @@
 # Cookbook
 A simple Android cookbook app.
 
+A work in progress. Screengrabs from a previous testing version:
+
+![recipeviewer](https://i.imgur.com/zJCwsrc.png)
+
 # License
 
     Copyright 2018 Juha Nuutinen

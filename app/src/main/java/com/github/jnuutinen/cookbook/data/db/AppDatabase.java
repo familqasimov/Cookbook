@@ -49,7 +49,7 @@ public abstract class AppDatabase extends RoomDatabase {
         return isDatabaseCreated;
     }
 
-    public static void insertRecipe(final Recipe recipe) {
+    public void insertRecipe(final Recipe recipe) {
         executors.diskIo().execute(() -> instance.runInTransaction(() ->
                 instance.recipeDao().insert(recipe)));
     }

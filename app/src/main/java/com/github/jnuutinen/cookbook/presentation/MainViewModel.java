@@ -12,22 +12,20 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
-
 public class MainViewModel extends AndroidViewModel {
     private final MediatorLiveData<List<Recipe>> observableRecipes;
     private final MediatorLiveData<List<Category>> observableCategories;
-    private final CookbookApp application;
+
 
     public MainViewModel(@NonNull Application application) {
         super(application);
-        this.application = (CookbookApp) application;
         observableRecipes = new MediatorLiveData<>();
         //observableRecipes.setValue(null);
         observableCategories = new MediatorLiveData<>();
         //observableCategories.setValue(null);
-        LiveData<List<Recipe>> recipes = ((this.application).getRepository().getRecipes());
+        LiveData<List<Recipe>> recipes = (((CookbookApp) application).getRepository().getRecipes());
         observableRecipes.addSource(recipes, observableRecipes::setValue);
-        LiveData<List<Category>> categories = (this.application).getRepository().getCategories();
+        LiveData<List<Category>> categories = ((CookbookApp) application).getRepository().getCategories();
         observableCategories.addSource(categories, observableCategories::setValue);
     }
 

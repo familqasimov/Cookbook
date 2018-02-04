@@ -1,13 +1,13 @@
 package com.github.jnuutinen.cookbook.data.db;
 
-
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class DataGenerator {
+class DataGenerator {
     private static final String[] RECIPE_NAME = new String[] {
             "Recipe1", "Recipe2", "Recipe3", "Recipe4"};
     private static final String[][] RECIPE_INGREDIENTS = new String[][] {
@@ -21,7 +21,7 @@ public class DataGenerator {
     private static final String[] CATEGORY_NAME = new String[] {
             "Category1", "Category2", "Category3", "Category4"};
 
-    public static List<Recipe> generateRecipes() {
+    static List<Recipe> generateRecipes() {
         List<Recipe> recipes = new ArrayList<>(RECIPE_NAME.length);
         for (int i = 0; i < RECIPE_NAME.length; i++) {
             Recipe recipe = new Recipe();
@@ -29,19 +29,18 @@ public class DataGenerator {
             recipe.setCategoryId(null);
             recipe.setInstructions(RECIPE_INSTRUCTIONS[i]);
             ArrayList<String> ingredients = new ArrayList<>(RECIPE_INGREDIENTS[0].length);
-            for (int j = 0; j < RECIPE_INGREDIENTS[0].length; j++) {
-                ingredients.add(RECIPE_INGREDIENTS[i][j]);
-            }
+            ingredients.addAll(Arrays.asList(RECIPE_INGREDIENTS[i])
+                    .subList(0, RECIPE_INGREDIENTS[0].length));
             recipe.setIngredients(ingredients);
             recipes.add(recipe);
         }
         return recipes;
     }
 
-    public static List<Category> generateCategories() {
+    static List<Category> generateCategories() {
         List<Category> categories = new ArrayList<>(CATEGORY_NAME.length);
-        for (int i = 0; i < CATEGORY_NAME.length; i++) {
-            categories.add(new Category(CATEGORY_NAME[i]));
+        for (String aCATEGORY_NAME : CATEGORY_NAME) {
+            categories.add(new Category(aCATEGORY_NAME));
         }
         return categories;
     }

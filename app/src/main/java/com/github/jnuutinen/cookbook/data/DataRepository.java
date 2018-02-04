@@ -1,6 +1,5 @@
 package com.github.jnuutinen.cookbook.data;
 
-
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 

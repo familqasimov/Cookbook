@@ -14,11 +14,9 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import java.util.List;
 
 class RecipeAdapter extends ArrayAdapter<Recipe> {
-    private List<Recipe> recipes;
 
     RecipeAdapter(Context context, List<Recipe> recipes) {
         super(context, 0, recipes);
-        this.recipes = recipes;
     }
 
     @Override
@@ -55,10 +53,6 @@ class RecipeAdapter extends ArrayAdapter<Recipe> {
                 viewHolder.category.setText(recipe.getCategory());
             }
         }
-
-        convertView.setOnClickListener(view -> {
-
-        });
 
         // Return the completed view to render on screen
         return convertView;

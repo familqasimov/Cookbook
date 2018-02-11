@@ -26,10 +26,6 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;
     private static AppExecutors executors;
-
-    public abstract RecipeDao recipeDao();
-    public abstract CategoryDao categoryDao();
-
     private final MutableLiveData<Boolean> isDatabaseCreated = new MutableLiveData<>();
 
     public static AppDatabase getInstance(final Context context, final AppExecutors appExecutors) {
@@ -43,15 +39,6 @@ public abstract class AppDatabase extends RoomDatabase {
             }
         }
         return instance;
-    }
-
-    public LiveData<Boolean> getDatabaseCreated() {
-        return isDatabaseCreated;
-    }
-
-    public void insertRecipe(final Recipe recipe) {
-        executors.diskIo().execute(() -> instance.runInTransaction(() ->
-                instance.recipeDao().insert(recipe)));
     }
 
     private static AppDatabase buildDatabase(final Context appContext) {
@@ -71,6 +58,23 @@ public abstract class AppDatabase extends RoomDatabase {
                 }).build();
     }
 
+    private static void insertData(final AppDatabase database,
+                                   final List<Category> categories,
+                                   final List<Recipe> recipes) {
+        database.runInTransaction(() -> {
+            database.categoryDao().insertAll(categories);
+            database.recipeDao().insertAll(recipes);
+        });
+    }
+
+    abstract RecipeDao recipeDao();
+
+    abstract CategoryDao categoryDao();
+
+    public LiveData<Boolean> getDatabaseCreated() {
+        return isDatabaseCreated;
+    }
+
     private void updateDatabaseCreated(final Context context) {
         if (context.getDatabasePath(DB_NAME).exists()) {
             setDatabaseCreated();
@@ -81,12 +85,21 @@ public abstract class AppDatabase extends RoomDatabase {
         isDatabaseCreated.postValue(true);
     }
 
-    private static void insertData(final AppDatabase database,
-                                   final List<Category> categories,
-                                   final List<Recipe> recipes) {
-        database.runInTransaction(() -> {
-            database.categoryDao().insertAll(categories);
-            database.recipeDao().insertAll(recipes);
-        });
+    public void deleteRecipe(final Recipe recipe) {
+        executors.diskIo().execute(() -> instance.runInTransaction(() ->
+                instance.recipeDao().delete(recipe)));
+    }
+
+    public LiveData<List<Category>> getAllCategories() {
+        return categoryDao().getAll();
+    }
+
+    public LiveData<List<Recipe>> getAllRecipes() {
+        return recipeDao().getAll();
+    }
+
+    public void insertRecipe(final Recipe recipe) {
+        executors.diskIo().execute(() -> instance.runInTransaction(() ->
+                instance.recipeDao().insert(recipe)));
     }
 }

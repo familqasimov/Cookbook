@@ -1,5 +1,6 @@
 package com.github.jnuutinen.cookbook.presentation.view;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -30,6 +31,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
 
     private AlertDialog deleteDialog;
     private Recipe recipe;
+    private ViewRecipeViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        viewModel = ViewModelProviders.of(this).get(ViewRecipeViewModel.class);
 
         buildDeleteDialog();
 
@@ -71,7 +74,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.alert_delete_recipe);
         builder.setPositiveButton(R.string.yes, (dialog, id) -> {
-            // TODO: delete recipe from db
+            viewModel.deleteRecipe(recipe);
             setResult(RESULT_OK, new Intent());
             finish();
         });

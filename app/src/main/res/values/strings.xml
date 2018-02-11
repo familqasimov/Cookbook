@@ -21,4 +21,6 @@
     <string name="action_delete_recipe">Delete recipe</string>
     <string name="cancel">Cancel</string>
     <string name="alert_delete_recipe">Delete recipe?</string>
+    <string name="title_activity_example">exampleActivity</string>
+    <string name="alert_recipe_saved">Recipe saved!</string>
 </resources>

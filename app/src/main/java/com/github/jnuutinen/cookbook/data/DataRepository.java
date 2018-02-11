@@ -20,13 +20,13 @@ public class DataRepository {
         this.appDatabase = appDatabase;
         observableRecipes = new MediatorLiveData<>();
         observableCategories = new MediatorLiveData<>();
-        observableRecipes.addSource(appDatabase.recipeDao().getAll(),
+        observableRecipes.addSource(appDatabase.getAllRecipes(),
                 recipeEntities -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
                         observableRecipes.postValue(recipeEntities);
                     }
                 });
-        observableCategories.addSource(appDatabase.categoryDao().getAll(),
+        observableCategories.addSource(appDatabase.getAllCategories(),
                 categoryEntities -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
                         observableCategories.postValue(categoryEntities);
@@ -45,13 +45,17 @@ public class DataRepository {
         return instance;
     }
 
-    public LiveData<List<Recipe>> getRecipes() {
-        return observableRecipes;
+    public void deleteRecipe(Recipe recipe) {
+        instance.appDatabase.deleteRecipe(recipe);
     }
 
     @SuppressWarnings("unused")
     public LiveData<List<Category>> getCategories() {
         return observableCategories;
+    }
+
+    public LiveData<List<Recipe>> getRecipes() {
+        return observableRecipes;
     }
 
     public void saveRecipe(Recipe recipe) {

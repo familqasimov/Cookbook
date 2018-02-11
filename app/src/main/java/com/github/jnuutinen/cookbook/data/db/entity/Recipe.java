@@ -1,43 +1,67 @@
 package com.github.jnuutinen.cookbook.data.db.entity;
 
-import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static android.arch.persistence.room.ForeignKey.SET_NULL;
+@Entity
+public class Recipe implements Parcelable {
+    public static final Parcelable.Creator<Recipe> CREATOR = new Parcelable.Creator<Recipe>() {
+        public Recipe createFromParcel(Parcel in) {
+            return new Recipe(in);
+        }
 
-@Entity(foreignKeys = @ForeignKey(entity = Category.class,
-                                  parentColumns = "id",
-                                  childColumns = "category_id",
-                                  onDelete = SET_NULL))
-public class Recipe {
+        public Recipe[] newArray(int size) {
+            return new Recipe[size];
+        }
+    };
     @PrimaryKey(autoGenerate = true)
     private Integer id;
-
     private String name;
-
     @Nullable
-    @ColumnInfo(name = "category_id")
-    private Integer categoryId;
-
+    private String category;
     private List<String> ingredients;
-
     private String instructions;
 
     public Recipe() {
     }
 
     @Ignore
-    public Recipe(String name, @Nullable Integer categoryId, List<String> ingredients, String instructions) {
+    public Recipe(String name, @Nullable String category, List<String> ingredients, String instructions) {
         this.name = name;
-        this.categoryId = categoryId;
+        this.category = category;
         this.ingredients = ingredients;
         this.instructions = instructions;
+    }
+
+    @Ignore
+    private Recipe(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        category = in.readString();
+        ingredients = new ArrayList<>();
+        in.readStringList(ingredients);
+        instructions = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeString(category);
+        dest.writeStringList(ingredients);
+        dest.writeString(instructions);
     }
 
     public Integer getId() {
@@ -55,12 +79,12 @@ public class Recipe {
     }
 
     @Nullable
-    public Integer getCategoryId() {
-        return categoryId;
+    public String getCategory() {
+        return category;
     }
 
-    public void setCategoryId(@Nullable Integer categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(@Nullable String category) {
+        this.category = category;
     }
 
     public List<String> getIngredients() {

@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation;
+package com.github.jnuutinen.cookbook.presentation.create;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,20 +9,24 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
-import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
 
 import java.util.List;
 
-public class RecipeAdapter extends ArrayAdapter<Recipe> {
+public class CategorySpinnerAdapter extends ArrayAdapter<Category> {
+    private List<Category> categories;
 
-    // View lookup cache
-    private static class ViewHolder {
-        TextView name;
-        TextView category;
+    CategorySpinnerAdapter(Context context, List<Category> categories) {
+        super(context, 0, categories);
+        this.categories = categories;
     }
 
-    public RecipeAdapter(Context context, List<Recipe> recipes) {
-        super(context, 0, recipes);
+    @Override
+    public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+        TextView name = new TextView(getContext());
+        name.setPadding(16, 16, 16, 16);
+        name.setText(categories.get(position).getName());
+        return name;
     }
 
     @Override
@@ -30,7 +34,7 @@ public class RecipeAdapter extends ArrayAdapter<Recipe> {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         // Get recipe item for this position
-        Recipe recipe = getItem(position);
+        Category category = getItem(position);
 
         // Check if an existing view is being reused, otherwise inflate view
         ViewHolder viewHolder; // view lookup cache stored in tag
@@ -39,9 +43,8 @@ public class RecipeAdapter extends ArrayAdapter<Recipe> {
             // No view to reuse, inflate new view
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.item_recipe, parent, false);
-            viewHolder.name = convertView.findViewById(R.id.text_recipe_name);
-            viewHolder.category = convertView.findViewById(R.id.text_recipe_category);
+            convertView = inflater.inflate(R.layout.item_spinner_category, parent, false);
+            viewHolder.name = convertView.findViewById(R.id.text_category_spinner);
 
             // Cache the viewHolder object inside the fresh view
             convertView.setTag(viewHolder);
@@ -51,18 +54,16 @@ public class RecipeAdapter extends ArrayAdapter<Recipe> {
         }
         // Populate the data from the data object via the viewHolder object
         // into the template view.
-        if (recipe != null) { // TODO: idk it said recipe.getName may produce NullPointerException
-            viewHolder.name.setText(recipe.getName());
-            if (recipe.getCategoryId() == null) {
-                viewHolder.category.setText("No category");
-            } else {
-                // TODO: set category name instead of id
-                viewHolder.category.setText(recipe.getCategoryId());
-            }
+        if (category != null) {
+            viewHolder.name.setText(category.getName());
         }
 
         // Return the completed view to render on screen
         return convertView;
     }
 
+    // View lookup cache
+    private static class ViewHolder {
+        TextView name;
+    }
 }

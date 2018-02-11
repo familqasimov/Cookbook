@@ -49,6 +49,7 @@ public class DataRepository {
         return observableRecipes;
     }
 
+    @SuppressWarnings("unused")
     public LiveData<List<Category>> getCategories() {
         return observableCategories;
     }

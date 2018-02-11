@@ -1,6 +1,5 @@
 package com.github.jnuutinen.cookbook;
 
-
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -17,7 +16,7 @@ public class AppExecutors {
         this.mainThread = mainThread;
     }
 
-    public AppExecutors() {
+    AppExecutors() {
         this(Executors.newSingleThreadExecutor(), new MainThreadExecutor());
     }
 
@@ -25,6 +24,8 @@ public class AppExecutors {
         return diskIo;
     }
 
+
+    @SuppressWarnings("unused")
     public Executor mainThread() {
         return mainThread;
     }

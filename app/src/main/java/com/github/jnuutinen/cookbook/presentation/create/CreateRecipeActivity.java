@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation;
+package com.github.jnuutinen.cookbook.presentation.create;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -11,10 +11,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
 import com.github.jnuutinen.cookbook.R;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.ArrayList;
@@ -29,10 +31,12 @@ public class CreateRecipeActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.edit_name) EditText editTextName;
     @BindView(R.id.edit_instructions) EditText editTextInstructions;
+    @BindView(R.id.spinner_category)
+    Spinner spinnerCategory;
 
     private CreateRecipeViewModel viewModel;
     private ArrayList<String> ingredients;
-    private Integer categoryId;
+    private String category;
     private String name;
     private String instructions;
 
@@ -45,6 +49,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         viewModel = ViewModelProviders.of(this).get(CreateRecipeViewModel.class);
+        populateCategoriesSpinner();
         newRow();
     }
 
@@ -76,6 +81,21 @@ public class CreateRecipeActivity extends AppCompatActivity {
         if (numberOfRows > 1) table.removeViewAt(numberOfRows - 1);
     }
 
+    private void getRecipeInfo() {
+        ingredients = new ArrayList<>();
+        category = ((Category) spinnerCategory.getSelectedItem()).getName();
+        name = editTextName.getText().toString().trim();
+        instructions = editTextInstructions.getText().toString().trim();
+        for (int i = 0; i < table.getChildCount(); i++) {
+            View view = table.getChildAt(i);
+            TableRow row = (TableRow) view;
+            if (((EditText) row.getChildAt(0)).getText().toString().trim().length() == 0) {
+                continue;
+            }
+            ingredients.add(((EditText) row.getChildAt(0)).getText().toString().trim());
+        }
+    }
+
     private void newRow() {
         TableRow row = new TableRow(this);
         TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
@@ -90,24 +110,15 @@ public class CreateRecipeActivity extends AppCompatActivity {
         table.addView(row);
     }
 
-    private void getRecipeInfo() {
-        ingredients = new ArrayList<>();
-        categoryId = null; // TODO: categoryId
-        name = editTextName.getText().toString().trim();
-        instructions = editTextInstructions.getText().toString().trim();
-        for (int i = 0; i < table.getChildCount(); i++) {
-            View view = table.getChildAt(i);
-            TableRow row = (TableRow) view;
-            if (((EditText) row.getChildAt(0)).getText().toString().trim().length() == 0) {
-                continue;
-            }
-            ingredients.add(((EditText) row.getChildAt(0)).getText().toString().trim());
-        }
+    private void populateCategoriesSpinner() {
+        viewModel.getCategories().observe(this, categories ->
+                spinnerCategory.setAdapter(new CategorySpinnerAdapter(this, categories)));
+        ArrayList<Category> testList = new ArrayList<>();
     }
 
     private void saveRecipe() {
         getRecipeInfo();
-        Recipe recipe = new Recipe(name, categoryId, ingredients, instructions);
+        Recipe recipe = new Recipe(name, category, ingredients, instructions);
         viewModel.insertRecipe(recipe);
         setResult(RESULT_OK, new Intent());
     }

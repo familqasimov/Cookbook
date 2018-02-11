@@ -15,4 +15,10 @@
     <string name="action_cancel">Cancel</string>
     <string name="create_recipe_cancel">Discard changes?</string>
     <string name="yes">Yes</string>
+    <string name="recipe_no_category">No category</string>
+    <string name="title_activity_view_recipe">ViewRecipeActivity</string>
+    <string name="action_edit_recipe">Edit recipe</string>
+    <string name="action_delete_recipe">Delete recipe</string>
+    <string name="cancel">Cancel</string>
+    <string name="alert_delete_recipe">Delete recipe?</string>
 </resources>

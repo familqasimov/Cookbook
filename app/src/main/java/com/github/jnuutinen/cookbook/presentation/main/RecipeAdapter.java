@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook;
+package com.github.jnuutinen.cookbook.presentation.main;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -8,19 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+import com.github.jnuutinen.cookbook.R;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
-public class RecipeAdapter extends ArrayAdapter<RecipeEntity> {
+class RecipeAdapter extends ArrayAdapter<Recipe> {
 
-    // View lookup cache
-    private static class ViewHolder {
-        TextView name;
-        TextView category;
-    }
-
-    public RecipeAdapter(Context context, List<RecipeEntity> recipes) {
+    RecipeAdapter(Context context, List<Recipe> recipes) {
         super(context, 0, recipes);
     }
 
@@ -29,7 +24,7 @@ public class RecipeAdapter extends ArrayAdapter<RecipeEntity> {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
         // Get recipe item for this position
-        RecipeEntity recipe = getItem(position);
+        Recipe recipe = getItem(position);
 
         // Check if an existing view is being reused, otherwise inflate view
         ViewHolder viewHolder; // view lookup cache stored in tag
@@ -50,18 +45,23 @@ public class RecipeAdapter extends ArrayAdapter<RecipeEntity> {
         }
         // Populate the data from the data object via the viewHolder object
         // into the template view.
-        if (recipe != null) { // TODO: idk it said recipe.getName may produce NullPointerException
+        if (recipe != null) {
             viewHolder.name.setText(recipe.getName());
-            if (recipe.getCategoryId() == null) {
-                viewHolder.category.setText("No category");
+            if (recipe.getCategory() == null) {
+                viewHolder.category.setText(R.string.recipe_no_category);
             } else {
-                // TODO: set category name instead of id
-                viewHolder.category.setText(recipe.getCategoryId());
+                viewHolder.category.setText(recipe.getCategory());
             }
         }
 
         // Return the completed view to render on screen
         return convertView;
+    }
+
+    // View lookup cache
+    private static class ViewHolder {
+        TextView name;
+        TextView category;
     }
 
 }

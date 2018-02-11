@@ -1,25 +1,26 @@
-package com.github.jnuutinen.cookbook.presentation;
+package com.github.jnuutinen.cookbook.presentation.main;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import com.github.jnuutinen.cookbook.MainViewModel;
 import com.github.jnuutinen.cookbook.R;
-import com.github.jnuutinen.cookbook.RecipeAdapter;
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
+import com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.view.ViewRecipeActivity;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnItemClick;
 
 public class MainActivity extends AppCompatActivity {
     //private static final String TAG = MainActivity.class.getSimpleName();
@@ -28,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.list_recipes) ListView recipeList;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
-    private MainViewModel viewModel;
+    private List<Recipe> liveRecipes;
+    private RecipeAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_ADD_RECIPE:
                 if (resultCode == RESULT_OK) {
-                    // TODO: recipe saved, display snackbar?
+                    Snackbar.make(recipeList, R.string.alert_recipe_saved, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.alert_recipe_saved, null).show();
                 }
         }
     }
@@ -66,15 +69,26 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void observe() {
-        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        viewModel.getRecipes().observe(this, recipeEntities ->
-                recipeList.setAdapter(new RecipeAdapter(this, recipeEntities)));
-    }
-
     @OnClick(R.id.button_add_recipe)
     void addRecipe() {
         startActivityForResult(new Intent(this, CreateRecipeActivity.class),
                 REQUEST_ADD_RECIPE);
+    }
+
+    @OnItemClick(R.id.list_recipes)
+    void viewRecipe(int position) {
+        Intent intent = new Intent(this, ViewRecipeActivity.class);
+        intent.putExtra("recipe", liveRecipes.get(position));
+        startActivity(intent);
+    }
+
+    private void observe() {
+        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel.getRecipes().observe(this, recipes -> {
+            adapter = new RecipeAdapter(this, recipes);
+                    recipeList.setAdapter(adapter);
+                    liveRecipes = recipes;
+                }
+        );
     }
 }

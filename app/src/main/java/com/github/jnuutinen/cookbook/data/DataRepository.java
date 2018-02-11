@@ -1,12 +1,11 @@
-package com.github.jnuutinen.cookbook;
-
+package com.github.jnuutinen.cookbook.data;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 
 import com.github.jnuutinen.cookbook.data.db.AppDatabase;
-import com.github.jnuutinen.cookbook.data.db.entity.CategoryEntity;
-import com.github.jnuutinen.cookbook.data.db.entity.RecipeEntity;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
@@ -14,20 +13,20 @@ public class DataRepository {
     private static DataRepository instance;
 
     private final AppDatabase appDatabase;
-    private MediatorLiveData<List<RecipeEntity>> observableRecipes;
-    private MediatorLiveData<List<CategoryEntity>> observableCategories;
+    private MediatorLiveData<List<Recipe>> observableRecipes;
+    private MediatorLiveData<List<Category>> observableCategories;
 
     private DataRepository(final AppDatabase appDatabase) {
         this.appDatabase = appDatabase;
         observableRecipes = new MediatorLiveData<>();
         observableCategories = new MediatorLiveData<>();
-        observableRecipes.addSource(appDatabase.recipeDao().getAll(),
+        observableRecipes.addSource(appDatabase.getAllRecipes(),
                 recipeEntities -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
                         observableRecipes.postValue(recipeEntities);
                     }
                 });
-        observableCategories.addSource(appDatabase.categoryDao().getAll(),
+        observableCategories.addSource(appDatabase.getAllCategories(),
                 categoryEntities -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
                         observableCategories.postValue(categoryEntities);
@@ -46,15 +45,20 @@ public class DataRepository {
         return instance;
     }
 
-    public LiveData<List<RecipeEntity>> getRecipes() {
-        return observableRecipes;
+    public void deleteRecipe(Recipe recipe) {
+        instance.appDatabase.deleteRecipe(recipe);
     }
 
-    public LiveData<List<CategoryEntity>> getCategories() {
+    @SuppressWarnings("unused")
+    public LiveData<List<Category>> getCategories() {
         return observableCategories;
     }
 
-    public void saveRecipe(RecipeEntity recipe) {
-        appDatabase.insertRecipe(recipe);
+    public LiveData<List<Recipe>> getRecipes() {
+        return observableRecipes;
+    }
+
+    public void saveRecipe(Recipe recipe) {
+        instance.appDatabase.insertRecipe(recipe);
     }
 }

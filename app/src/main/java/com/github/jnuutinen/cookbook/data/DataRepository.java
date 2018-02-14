@@ -61,4 +61,8 @@ public class DataRepository {
     public void saveRecipe(Recipe recipe) {
         instance.appDatabase.insertRecipe(recipe);
     }
+
+    public void updateRecipe(Recipe recipe) {
+        instance.appDatabase.updateRecipe(recipe);
+    }
 }

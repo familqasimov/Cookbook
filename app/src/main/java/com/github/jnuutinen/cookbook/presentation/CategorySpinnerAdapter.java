@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation.create;
+package com.github.jnuutinen.cookbook.presentation;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -16,7 +16,7 @@ import java.util.List;
 public class CategorySpinnerAdapter extends ArrayAdapter<Category> {
     private List<Category> categories;
 
-    CategorySpinnerAdapter(Context context, List<Category> categories) {
+    public CategorySpinnerAdapter(Context context, List<Category> categories) {
         super(context, 0, categories);
         this.categories = categories;
     }

@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation.create;
+package com.github.jnuutinen.cookbook.presentation.edit;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -25,18 +25,22 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-// TODO: cache unsaved recipe?
-public class CreateRecipeActivity extends AppCompatActivity {
-    //private static final String TAG = CreateRecipeActivity.class.getSimpleName();
+public class EditRecipeActivity extends AppCompatActivity {
+//private static final String TAG = EditRecipeActivity.class.getSimpleName();
 
-    @BindView(R.id.table_ingredients) TableLayout table;
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.edit_name) EditText editTextName;
-    @BindView(R.id.edit_instructions) EditText editTextInstructions;
+    @BindView(R.id.table_ingredients)
+    TableLayout table;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.edit_name)
+    EditText editTextName;
+    @BindView(R.id.edit_instructions)
+    EditText editTextInstructions;
     @BindView(R.id.spinner_category)
     Spinner spinnerCategory;
 
-    private CreateRecipeViewModel viewModel;
+    private Recipe recipe;
+    private EditRecipeViewModel viewModel;
     private ArrayList<String> ingredients;
     private String category;
     private String name;
@@ -50,9 +54,11 @@ public class CreateRecipeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        viewModel = ViewModelProviders.of(this).get(CreateRecipeViewModel.class);
+
+        viewModel = ViewModelProviders.of(this).get(EditRecipeViewModel.class);
         populateCategoriesSpinner();
-        newRow();
+        recipe = getIntent().getParcelableExtra("recipe");
+        populate();
     }
 
     @Override
@@ -63,11 +69,24 @@ public class CreateRecipeActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra("recipe", recipe);
+        setResult(RESULT_CANCELED, intent);
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
-            saveRecipe();
+            updateRecipe();
+            finish();
+            return true;
+        } else if (id == android.R.id.home) {
+            Intent intent = new Intent();
+            intent.putExtra("recipe", recipe);
+            setResult(RESULT_CANCELED, intent);
             finish();
             return true;
         }
@@ -98,6 +117,24 @@ public class CreateRecipeActivity extends AppCompatActivity {
         }
     }
 
+    private void initRows() {
+        for (int i = 0; i < recipe.getIngredients().size(); i++) {
+            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(16, 16, 16, 16);
+            TableRow row = new TableRow(this);
+            row.setLayoutParams(lp);
+            EditText ingredient = new EditText(this);
+            lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.2f);
+            ingredient.setLayoutParams(lp);
+            ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(38)});
+            ingredient.setMaxLines(2);
+            ingredient.setText(recipe.getIngredients().get(i));
+            row.addView(ingredient);
+            table.addView(row);
+        }
+        if (table.getChildCount() == 0) newRow(new View(this));
+    }
+
     private void newRow() {
         TableRow row = new TableRow(this);
         TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
@@ -112,15 +149,28 @@ public class CreateRecipeActivity extends AppCompatActivity {
         table.addView(row);
     }
 
+    private void populate() {
+        editTextName.setText(recipe.getName());
+        editTextInstructions.setText(recipe.getInstructions());
+        // TODO: set selection to previous category
+        spinnerCategory.setSelection(0);
+        initRows();
+    }
+
     private void populateCategoriesSpinner() {
         viewModel.getCategories().observe(this, categories ->
                 spinnerCategory.setAdapter(new CategorySpinnerAdapter(this, categories)));
     }
 
-    private void saveRecipe() {
+    private void updateRecipe() {
         getRecipeInfo();
-        Recipe recipe = new Recipe(name, category, ingredients, instructions);
-        viewModel.insertRecipe(recipe);
-        setResult(RESULT_OK, new Intent());
+        recipe.setName(name);
+        recipe.setCategory(category);
+        recipe.setIngredients(ingredients);
+        recipe.setInstructions(instructions);
+        viewModel.updateRecipe(recipe);
+        Intent intent = new Intent();
+        intent.putExtra("recipe", recipe);
+        setResult(RESULT_OK, intent);
     }
 }

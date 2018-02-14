@@ -40,6 +40,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
         </activity>
+        <activity
+            android:name=".presentation.edit.EditRecipeActivity"
+            android:label="@string/title_activity_edit_recipe"
+            android:parentActivityName=".presentation.view.ViewRecipeActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.jnuutinen.cookbook.presentation.view.ViewRecipeActivity" />
+        </activity>
     </application>
 
 </manifest>

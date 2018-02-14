@@ -102,4 +102,9 @@ public abstract class AppDatabase extends RoomDatabase {
         executors.diskIo().execute(() -> instance.runInTransaction(() ->
                 instance.recipeDao().insert(recipe)));
     }
+
+    public void updateRecipe(final Recipe recipe) {
+        executors.diskIo().execute(() -> instance.runInTransaction(() ->
+                instance.recipeDao().update(recipe)));
+    }
 }

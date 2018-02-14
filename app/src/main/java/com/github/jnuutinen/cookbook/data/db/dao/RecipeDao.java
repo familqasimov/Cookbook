@@ -5,6 +5,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
@@ -20,6 +21,9 @@ public interface RecipeDao {
 
     @Insert
     void insertAll(List<Recipe> recipeEntities);
+
+    @Update
+    void update(Recipe recipe);
 
     @Delete
     void delete(Recipe recipe);

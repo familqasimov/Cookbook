@@ -50,6 +50,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
         buildDeleteDialog();
         //noinspection ConstantConditions
         recipe = getIntent().getParcelableExtra("recipe");
+        setTitle(recipe.getName());
         getRecipe();
     }
 

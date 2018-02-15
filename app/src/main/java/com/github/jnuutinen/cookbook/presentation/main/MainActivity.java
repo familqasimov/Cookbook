@@ -1,5 +1,6 @@
 package com.github.jnuutinen.cookbook.presentation.main;
 
+import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,12 +10,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity;
 import com.github.jnuutinen.cookbook.presentation.view.ViewRecipeActivity;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -25,12 +29,16 @@ import butterknife.OnItemClick;
 public class MainActivity extends AppCompatActivity {
     //private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ADD_RECIPE = 1;
+    private static String sort = "name";
 
     @BindView(R.id.list_recipes) ListView recipeList;
+    @BindView(R.id.text_sort)
+    TextView sortText;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     private List<Recipe> liveRecipes;
     private RecipeAdapter adapter;
+    private AlertDialog sortDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+
+        createSortDialog();
         observe();
     }
 
@@ -65,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_sort) {
+            sortDialog.show();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -82,13 +95,62 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void createSortDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.alert_sort_recipes)
+                .setItems(R.array.sort_types, (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            sort = "name";
+                            break;
+                        case 1:
+                            sort = "category";
+                            break;
+                    }
+                    observe();
+                });
+        sortDialog = builder.create();
+    }
+
     private void observe() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         viewModel.getRecipes().observe(this, recipes -> {
+            liveRecipes = sortRecipes(sort, recipes);
             adapter = new RecipeAdapter(this, recipes);
                     recipeList.setAdapter(adapter);
-                    liveRecipes = recipes;
                 }
         );
+    }
+
+    private List<Recipe> sortRecipes(String sortType, List<Recipe> toBeSorted) {
+        // name order comparator
+        Comparator<Recipe> nameOrder = (entry1, entry2) -> {
+            final String name1 = entry1.getName();
+            final String name2 = entry2.getName();
+            return name1.compareTo(name2);
+        };
+        // category order comparator
+        Comparator<Recipe> catOrder = (entry1, entry2) -> {
+            final String cat1 = entry1.getCategory();
+            final String cat2 = entry2.getCategory();
+            if (cat1 == null && cat2 == null) {
+                return 0;
+            } else if (cat1 == null) {
+                return -1;
+            } else if (cat2 == null) {
+                return 1;
+            }
+            return cat1.compareTo(cat2);
+        };
+        // Sort by name first
+        Collections.sort(toBeSorted, nameOrder);
+        if (sortType.equals("name")) {
+            sortText.setText(R.string.title_sorted_by_name);
+        }
+        if (sortType.equals("category")) {
+            Collections.sort(toBeSorted, catOrder);
+            sortText.setText(R.string.title_sorted_by_category);
+        }
+        return toBeSorted;
     }
 }

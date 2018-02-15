@@ -3,7 +3,6 @@ package com.github.jnuutinen.cookbook.presentation.create;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
 import android.support.annotation.NonNull;
 
 import com.github.jnuutinen.cookbook.CookbookApp;
@@ -14,15 +13,13 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import java.util.List;
 
 class CreateRecipeViewModel extends AndroidViewModel {
-    private final MediatorLiveData<List<Category>> observableCategories;
+    private final LiveData<List<Category>> observableCategories;
     private DataRepository dataRepository;
 
     CreateRecipeViewModel(@NonNull Application application) {
         super(application);
-        observableCategories = new MediatorLiveData<>();
         dataRepository = ((CookbookApp) application).getRepository();
-        LiveData<List<Category>> categories = dataRepository.getCategories();
-        observableCategories.addSource(categories, observableCategories::setValue);
+        observableCategories = dataRepository.getCategories();
     }
 
     LiveData<List<Category>> getCategories() {

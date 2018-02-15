@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sort_types">
+        <item>@string/recipe_name_hint</item>
+        <item>@string/recipe_category</item>
+    </string-array>
+</resources>

@@ -1,7 +1,7 @@
 # Cookbook
 A simple Android cookbook app.
 
-A work in progress. Screengrabs from of current build:
+A work in progress. Screengrabs:
 
 ![cookbook](https://github.com/JNuutinen/Cookbook/blob/master/images/grabs.png)
 

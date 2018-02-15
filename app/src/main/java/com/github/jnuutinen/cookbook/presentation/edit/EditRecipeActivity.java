@@ -126,7 +126,7 @@ public class EditRecipeActivity extends AppCompatActivity {
             EditText ingredient = new EditText(this);
             lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.2f);
             ingredient.setLayoutParams(lp);
-            ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(38)});
+            ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
             ingredient.setMaxLines(2);
             ingredient.setText(recipe.getIngredients().get(i));
             row.addView(ingredient);
@@ -143,7 +143,7 @@ public class EditRecipeActivity extends AppCompatActivity {
         EditText ingredient = new EditText(this);
         lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.6f);
         ingredient.setLayoutParams(lp);
-        ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(38)});
+        ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
         ingredient.setMaxLines(2);
         row.addView(ingredient);
         table.addView(row);

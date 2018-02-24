@@ -14,7 +14,13 @@ import java.util.List;
 @Dao
 public interface RecipeDao {
     @Query("SELECT * FROM Recipe")
-    LiveData<List<Recipe>> getAll();
+    LiveData<List<Recipe>> liveGetAll();
+
+    @Query("SELECT * FROM Recipe")
+    List<Recipe> getAll();
+
+    @Query("SELECT * FROM Recipe WHERE name = :name")
+    Recipe getByName(String name);
 
     @Insert
     void insert(Recipe recipe);

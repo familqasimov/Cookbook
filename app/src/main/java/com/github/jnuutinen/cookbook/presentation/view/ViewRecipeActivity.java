@@ -22,16 +22,11 @@ import butterknife.ButterKnife;
 public class ViewRecipeActivity extends AppCompatActivity {
     private static final int REQUEST_EDIT_RECIPE = 1;
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.text_view_name)
-    TextView name;
-    @BindView(R.id.text_view_category)
-    TextView category;
-    @BindView(R.id.text_view_ingredients)
-    TextView ingredients;
-    @BindView(R.id.text_view_instructions)
-    TextView instructions;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.text_view_name) TextView name;
+    @BindView(R.id.text_view_category) TextView category;
+    @BindView(R.id.text_view_ingredients) TextView ingredients;
+    @BindView(R.id.text_view_instructions) TextView instructions;
 
     private AlertDialog deleteDialog;
     private Recipe recipe;
@@ -123,7 +118,8 @@ public class ViewRecipeActivity extends AppCompatActivity {
 
     private void getRecipe() {
         name.setText(recipe.getName());
-        category.setText(recipe.getCategory());
+        // TODO: category
+        category.setText("");
         ingredients.setText("");
         for (int i = 0; i < recipe.getIngredients().size(); i++) {
             ingredients.append(recipe.getIngredients().get(i) + "\n");

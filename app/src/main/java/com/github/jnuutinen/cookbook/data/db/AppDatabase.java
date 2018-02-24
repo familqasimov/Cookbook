@@ -9,6 +9,7 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import com.github.jnuutinen.cookbook.AppExecutors;
 import com.github.jnuutinen.cookbook.data.db.converter.ListConverter;
@@ -50,26 +51,32 @@ public abstract class AppDatabase extends RoomDatabase {
                         executors.diskIo().execute(() -> {
                             AppDatabase database = AppDatabase.getInstance(appContext, executors);
                             List<Category> categories = DataGenerator.generateCategories();
-                            List<Recipe> recipes = DataGenerator.generateRecipes();
-                            insertData(database, categories, recipes);
+                            categories = insertCategories(database, categories);
+                            List<Recipe> recipes = DataGenerator.generateRecipes(categories);
+                            insertRecipes(database, recipes);
                             database.setDatabaseCreated();
                         });
                     }
                 }).build();
     }
 
-    private static void insertData(final AppDatabase database,
-                                   final List<Category> categories,
-                                   final List<Recipe> recipes) {
-        database.runInTransaction(() -> {
-            database.categoryDao().insertAll(categories);
-            database.recipeDao().insertAll(recipes);
-        });
+    private static List<Category> insertCategories(final AppDatabase database,
+                                                   final List<Category> categories) {
+        database.runInTransaction(() -> database.categoryDao().insertAll(categories));
+        return database.categoryDao().getAll();
     }
 
-    abstract RecipeDao recipeDao();
+    private static void insertRecipes(final AppDatabase database,
+                                              final List<Recipe> recipes) {
+        database.runInTransaction(() -> database.recipeDao().insertAll(recipes));
+    }
 
-    abstract CategoryDao categoryDao();
+
+    @VisibleForTesting
+    public abstract RecipeDao recipeDao();
+
+    @VisibleForTesting
+    public abstract CategoryDao categoryDao();
 
     public LiveData<Boolean> getDatabaseCreated() {
         return isDatabaseCreated;
@@ -90,12 +97,28 @@ public abstract class AppDatabase extends RoomDatabase {
                 instance.recipeDao().delete(recipe)));
     }
 
-    public LiveData<List<Category>> getAllCategories() {
+    public List<Category> getAllCategories() {
         return categoryDao().getAll();
     }
 
-    public LiveData<List<Recipe>> getAllRecipes() {
+    public List<Recipe> getAllRecipes() {
         return recipeDao().getAll();
+    }
+
+    public LiveData<List<Category>> getAllLiveCategories() {
+        return categoryDao().liveGetAll();
+    }
+
+    public LiveData<List<Recipe>> getAllLiveRecipes() {
+        return recipeDao().liveGetAll();
+    }
+
+    public Category getCategoryByName(String name) {
+        return categoryDao().getByName(name);
+    }
+
+    public Recipe getRecipeByName(String name) {
+        return recipeDao().getByName(name);
     }
 
     public void insertRecipe(final Recipe recipe) {

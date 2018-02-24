@@ -33,8 +33,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.edit_name) EditText editTextName;
     @BindView(R.id.edit_instructions) EditText editTextInstructions;
-    @BindView(R.id.spinner_category)
-    Spinner spinnerCategory;
+    @BindView(R.id.spinner_category) Spinner spinnerCategory;
 
     private CreateRecipeViewModel viewModel;
     private ArrayList<String> ingredients;
@@ -119,7 +118,8 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
     private void saveRecipe() {
         getRecipeInfo();
-        Recipe recipe = new Recipe(name, category, ingredients, instructions);
+        // TODO: get category id
+        Recipe recipe = new Recipe(name, null, ingredients, instructions);
         viewModel.insertRecipe(recipe);
         setResult(RESULT_OK, new Intent());
     }

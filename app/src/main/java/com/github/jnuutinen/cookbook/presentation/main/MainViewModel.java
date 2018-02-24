@@ -10,13 +10,13 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
-class MainViewModel extends AndroidViewModel {
+public class MainViewModel extends AndroidViewModel {
     private final LiveData<List<Recipe>> observableRecipes;
 
-    MainViewModel(@NonNull Application application) {
+    public MainViewModel(@NonNull Application application) {
         super(application);
         //observableRecipes = new MediatorLiveData<>();
-        observableRecipes = (((CookbookApp) application).getRepository().getRecipes());
+        observableRecipes = (((CookbookApp) application).getRepository().getLiveRecipes());
     }
 
     LiveData<List<Recipe>> getRecipes() {

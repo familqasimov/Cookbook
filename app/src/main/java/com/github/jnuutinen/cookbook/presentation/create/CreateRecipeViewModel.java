@@ -12,14 +12,14 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
-class CreateRecipeViewModel extends AndroidViewModel {
+public class CreateRecipeViewModel extends AndroidViewModel {
     private final LiveData<List<Category>> observableCategories;
     private DataRepository dataRepository;
 
-    CreateRecipeViewModel(@NonNull Application application) {
+    public CreateRecipeViewModel(@NonNull Application application) {
         super(application);
         dataRepository = ((CookbookApp) application).getRepository();
-        observableCategories = dataRepository.getCategories();
+        observableCategories = dataRepository.getLiveCategories();
     }
 
     LiveData<List<Category>> getCategories() {

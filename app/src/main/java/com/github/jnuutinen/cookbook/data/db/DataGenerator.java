@@ -77,7 +77,15 @@ class DataGenerator {
             "Desserts",
 
             // Recipe 3 category
-            "Breads"
+            "Breads",
+
+            // Other categories
+            "Breakfast",
+            "Main courses",
+            "Snacks",
+            "Drinks",
+            "Starters",
+            "Soups"
     };
 
     static List<Category> generateCategories() {
@@ -88,12 +96,12 @@ class DataGenerator {
         return categories;
     }
 
-    static List<Recipe> generateRecipes() {
+    static List<Recipe> generateRecipes(List<Category> categories) {
         List<Recipe> recipes = new ArrayList<>(RECIPE_NAME.length);
         for (int i = 0; i < RECIPE_NAME.length; i++) {
             Recipe recipe = new Recipe();
             recipe.setName(RECIPE_NAME[i]);
-            recipe.setCategory(CATEGORY_NAME[i]);
+            recipe.setCategoryId(categories.get(i).getId());
             recipe.setInstructions(RECIPE_INSTRUCTIONS[i]);
             ArrayList<String> ingredients = new ArrayList<>(RECIPE_INGREDIENTS[0].length);
             ingredients.addAll(Arrays.asList(RECIPE_INGREDIENTS[i])

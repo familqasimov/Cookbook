@@ -28,21 +28,17 @@ import butterknife.ButterKnife;
 public class EditRecipeActivity extends AppCompatActivity {
 //private static final String TAG = EditRecipeActivity.class.getSimpleName();
 
-    @BindView(R.id.table_ingredients)
-    TableLayout table;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.edit_name)
-    EditText editTextName;
-    @BindView(R.id.edit_instructions)
-    EditText editTextInstructions;
-    @BindView(R.id.spinner_category)
-    Spinner spinnerCategory;
+    @BindView(R.id.table_ingredients) TableLayout table;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.edit_name) EditText editTextName;
+    @BindView(R.id.edit_instructions) EditText editTextInstructions;
+    @BindView(R.id.spinner_category) Spinner spinnerCategory;
 
+    private CategorySpinnerAdapter adapter;
     private Recipe recipe;
     private EditRecipeViewModel viewModel;
     private ArrayList<String> ingredients;
-    private String category;
+    private String categoryName;
     private String name;
     private String instructions;
 
@@ -56,7 +52,7 @@ public class EditRecipeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewModel = ViewModelProviders.of(this).get(EditRecipeViewModel.class);
-        populateCategoriesSpinner();
+        observe();
         recipe = getIntent().getParcelableExtra("recipe");
         populate();
     }
@@ -104,7 +100,7 @@ public class EditRecipeActivity extends AppCompatActivity {
 
     private void getRecipeInfo() {
         ingredients = new ArrayList<>();
-        category = ((Category) spinnerCategory.getSelectedItem()).getName();
+        categoryName = ((Category) spinnerCategory.getSelectedItem()).getName();
         name = editTextName.getText().toString().trim();
         instructions = editTextInstructions.getText().toString().trim();
         for (int i = 0; i < table.getChildCount(); i++) {
@@ -115,24 +111,6 @@ public class EditRecipeActivity extends AppCompatActivity {
             }
             ingredients.add(((EditText) row.getChildAt(0)).getText().toString().trim());
         }
-    }
-
-    private void initRows() {
-        for (int i = 0; i < recipe.getIngredients().size(); i++) {
-            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-            lp.setMargins(16, 16, 16, 16);
-            TableRow row = new TableRow(this);
-            row.setLayoutParams(lp);
-            EditText ingredient = new EditText(this);
-            lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.2f);
-            ingredient.setLayoutParams(lp);
-            ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
-            ingredient.setMaxLines(2);
-            ingredient.setText(recipe.getIngredients().get(i));
-            row.addView(ingredient);
-            table.addView(row);
-        }
-        if (table.getChildCount() == 0) newRow(new View(this));
     }
 
     private void newRow() {
@@ -152,20 +130,39 @@ public class EditRecipeActivity extends AppCompatActivity {
     private void populate() {
         editTextName.setText(recipe.getName());
         editTextInstructions.setText(recipe.getInstructions());
-        // TODO: set selection to previous category
-        spinnerCategory.setSelection(0);
-        initRows();
+        // Spinner selection set with callback when livedata is fetched
+
+        // Ingredient rows
+        for (int i = 0; i < recipe.getIngredients().size(); i++) {
+            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(16, 16, 16, 16);
+            TableRow row = new TableRow(this);
+            row.setLayoutParams(lp);
+            EditText ingredient = new EditText(this);
+            lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.2f);
+            ingredient.setLayoutParams(lp);
+            ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
+            ingredient.setMaxLines(2);
+            ingredient.setText(recipe.getIngredients().get(i));
+            row.addView(ingredient);
+            table.addView(row);
+        }
+        // If there are no ingredients, create one empty row.
+        if (table.getChildCount() == 0) newRow(new View(this));
     }
 
-    private void populateCategoriesSpinner() {
-        viewModel.getCategories().observe(this, categories ->
-                spinnerCategory.setAdapter(new CategorySpinnerAdapter(this, categories)));
+    private void observe() {
+        viewModel.getCategories().observe(this, categories -> {
+            adapter = new CategorySpinnerAdapter(this, categories);
+            spinnerCategory.setAdapter(adapter);
+        });
     }
 
     private void updateRecipe() {
         getRecipeInfo();
         recipe.setName(name);
-        recipe.setCategory(category);
+        // TODO: get category id
+        recipe.setCategoryId(null);
         recipe.setIngredients(ingredients);
         recipe.setInstructions(instructions);
         viewModel.updateRecipe(recipe);

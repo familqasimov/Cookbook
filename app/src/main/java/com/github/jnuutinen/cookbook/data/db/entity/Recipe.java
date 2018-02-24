@@ -1,31 +1,28 @@
 package com.github.jnuutinen.cookbook.data.db.entity;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-public class Recipe implements Parcelable {
-    public static final Parcelable.Creator<Recipe> CREATOR = new Parcelable.Creator<Recipe>() {
-        public Recipe createFromParcel(Parcel in) {
-            return new Recipe(in);
-        }
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static android.arch.persistence.room.ForeignKey.SET_DEFAULT;
 
-        public Recipe[] newArray(int size) {
-            return new Recipe[size];
-        }
-    };
+@Entity(foreignKeys = @ForeignKey(entity = Category.class,
+                                  parentColumns = "id",
+                                  childColumns = "categoryId",
+                                  onUpdate = CASCADE,
+                                  onDelete = SET_DEFAULT))
+public class Recipe implements Parcelable {
     @PrimaryKey(autoGenerate = true)
     private Integer id;
     private String name;
-    @Nullable
-    private String category;
+    private Integer categoryId = 0;
     private List<String> ingredients;
     private String instructions;
 
@@ -33,9 +30,9 @@ public class Recipe implements Parcelable {
     }
 
     @Ignore
-    public Recipe(String name, @Nullable String category, List<String> ingredients, String instructions) {
+    public Recipe(String name, Integer categoryId, List<String> ingredients, String instructions) {
         this.name = name;
-        this.category = category;
+        this.categoryId = categoryId;
         this.ingredients = ingredients;
         this.instructions = instructions;
     }
@@ -44,11 +41,23 @@ public class Recipe implements Parcelable {
     private Recipe(Parcel in) {
         id = in.readInt();
         name = in.readString();
-        category = in.readString();
+        categoryId = in.readInt();
         ingredients = new ArrayList<>();
         in.readStringList(ingredients);
         instructions = in.readString();
     }
+
+    public static final Parcelable.Creator<Recipe> CREATOR = new Parcelable.Creator<Recipe>() {
+        @Override
+        public Recipe createFromParcel(Parcel in) {
+            return new Recipe(in);
+        }
+
+        @Override
+        public Recipe[] newArray(int size) {
+            return new Recipe[size];
+        }
+    };
 
     @Override
     public int describeContents() {
@@ -59,7 +68,7 @@ public class Recipe implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(name);
-        dest.writeString(category);
+        dest.writeInt(categoryId);
         dest.writeStringList(ingredients);
         dest.writeString(instructions);
     }
@@ -68,7 +77,9 @@ public class Recipe implements Parcelable {
         return id;
     }
 
-    public void setId(Integer id) { this.id = id; }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -78,13 +89,12 @@ public class Recipe implements Parcelable {
         this.name = name;
     }
 
-    @Nullable
-    public String getCategory() {
-        return category;
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(@Nullable String category) {
-        this.category = category;
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
     public List<String> getIngredients() {

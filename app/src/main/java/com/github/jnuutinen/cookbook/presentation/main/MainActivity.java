@@ -32,8 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private static String sort = "name";
 
     @BindView(R.id.list_recipes) ListView recipeList;
-    @BindView(R.id.text_sort)
-    TextView sortText;
+    @BindView(R.id.text_sort) TextView sortText;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     private List<Recipe> liveRecipes;
@@ -131,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
         };
         // category order comparator
         Comparator<Recipe> catOrder = (entry1, entry2) -> {
-            final String cat1 = entry1.getCategory();
-            final String cat2 = entry2.getCategory();
+            final Integer cat1 = entry1.getCategoryId();
+            final Integer cat2 = entry2.getCategoryId();
             if (cat1 == null && cat2 == null) {
                 return 0;
             } else if (cat1 == null) {

@@ -36,4 +36,7 @@
     <string name="alert_blank_category_name">Category name can\'t be blank!</string>
     <string name="action_delete">Delete</string>
     <string name="title_create_category">Create category</string>
+    <string name="category_name_duplicate">There\'s already a category with that name!</string>
+    <string name="alert_category_saved">Category saved!</string>
+    <string name="alert_category_deleted">Category deleted!</string>
 </resources>

@@ -30,7 +30,9 @@ import butterknife.OnItemClick;
 public class MainActivity extends AppCompatActivity {
     //private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ADD_RECIPE = 1;
-    private static String sort = "name";
+    private static final int SORT_NAME = 0;
+    private static final int SORT_CATEGORY = 1;
+    private static int sort = SORT_NAME;
 
     @BindView(R.id.list_recipes) ListView recipeList;
     @BindView(R.id.text_sort) TextView sortText;
@@ -104,10 +106,10 @@ public class MainActivity extends AppCompatActivity {
                 .setItems(R.array.sort_types, (dialog, which) -> {
                     switch (which) {
                         case 0:
-                            sort = "name";
+                            sort = SORT_NAME;
                             break;
                         case 1:
-                            sort = "category";
+                            sort = SORT_CATEGORY;
                             break;
                     }
                     observe();
@@ -118,19 +120,19 @@ public class MainActivity extends AppCompatActivity {
     private void observe() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         viewModel.getRecipes().observe(this, recipes -> {
-            liveRecipes = sortRecipes(sort, recipes);
+            liveRecipes = sortRecipes(recipes);
             adapter = new RecipeAdapter(this, recipes);
                     recipeList.setAdapter(adapter);
                 }
         );
     }
 
-    private List<Recipe> sortRecipes(String sortType, List<Recipe> toBeSorted) {
+    private List<Recipe> sortRecipes(List<Recipe> toBeSorted) {
         // name order comparator
         Comparator<Recipe> nameOrder = (entry1, entry2) -> {
             final String name1 = entry1.getName();
             final String name2 = entry2.getName();
-            return name1.compareTo(name2);
+            return name1.compareToIgnoreCase(name2);
         };
         // category order comparator
         Comparator<Recipe> catOrder = (entry1, entry2) -> {
@@ -147,10 +149,10 @@ public class MainActivity extends AppCompatActivity {
         };
         // Sort by name first
         Collections.sort(toBeSorted, nameOrder);
-        if (sortType.equals("name")) {
+        if (sort == SORT_NAME) {
             sortText.setText(R.string.title_sorted_by_name);
         }
-        if (sortType.equals("category")) {
+        if (sort == SORT_CATEGORY) {
             Collections.sort(toBeSorted, catOrder);
             sortText.setText(R.string.title_sorted_by_category);
         }

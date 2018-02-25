@@ -93,7 +93,7 @@ public class EditCategoryActivity extends AppCompatActivity {
         } else {
             category.setName(categoryName);
             viewModel.updateCategory(category);
-            setResult(RESULT_OK, new Intent());
+            setResult(RESULT_FIRST_USER, new Intent());
             finish();
         }
     }

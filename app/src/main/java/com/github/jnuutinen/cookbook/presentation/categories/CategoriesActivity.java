@@ -16,6 +16,8 @@ import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
 import com.github.jnuutinen.cookbook.presentation.editcategory.EditCategoryActivity;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -24,6 +26,7 @@ import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 public class CategoriesActivity extends AppCompatActivity {
+    private static final int REQUEST_EDIT_CATEGORY = 1;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.list_categories) ListView categoriesList;
@@ -46,6 +49,26 @@ public class CategoriesActivity extends AppCompatActivity {
         observe();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_EDIT_CATEGORY:
+                /*
+                RESULT_OK == category was deleted
+                RESULT_FIRST_USER == category was edited
+                 */
+                if (resultCode == RESULT_OK) {
+                    Snackbar.make(categoriesList, R.string.alert_category_deleted,
+                            Snackbar.LENGTH_LONG).show();
+                } else if (resultCode == RESULT_FIRST_USER) { // TODO: custom result code
+                    Snackbar.make(categoriesList, R.string.alert_category_saved,
+                            Snackbar.LENGTH_LONG).show();
+                }
+                break;
+        }
+    }
+
     @OnClick(R.id.button_add_category)
     void addCategory() {
         addCategoryDialog.show();
@@ -55,7 +78,7 @@ public class CategoriesActivity extends AppCompatActivity {
     void editCategory(int position) {
         Intent intent = new Intent(this, EditCategoryActivity.class);
         intent.putExtra("category", liveCategories.get(position));
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_EDIT_CATEGORY);
     }
 
     private void buildCreateCategoryDialog() {
@@ -71,17 +94,44 @@ public class CategoriesActivity extends AppCompatActivity {
                         Snackbar.make(categoriesList, R.string.alert_blank_category_name,
                                 Snackbar.LENGTH_LONG).show();
                     } else {
-                        viewModel.insertCategory(new Category(categoryName));
+                        // Check for duplicate category
+                        boolean duplicateFound = false;
+                        for (Category c : liveCategories) {
+                            if (c.getName().toLowerCase().equals(categoryName.toLowerCase())) {
+                                duplicateFound = true;
+                                Snackbar.make(categoriesList, R.string.category_name_duplicate,
+                                        Snackbar.LENGTH_LONG).show();
+                                break;
+                            }
+                        }
+                        if (!duplicateFound) {
+                            viewModel.insertCategory(new Category(categoryName));
+                            Snackbar.make(categoriesList, R.string.alert_category_saved,
+                                    Snackbar.LENGTH_LONG).show();
+                        }
                     }
+                    ((EditText) dialogView.findViewById(R.id.edit_category_name)).setText("");
+                }).setNegativeButton(R.string.cancel, (dialog, which) -> {
+                    // Canceled, do nothing
                 }).create();
     }
 
     private void observe() {
         viewModel = ViewModelProviders.of(this).get(CategoriesViewModel.class);
         viewModel.getCategories().observe(this, categories -> {
-            liveCategories = categories;
-            categoriesList.setAdapter(new CategoryAdapter(this, categories));
+            liveCategories = sortCategories(categories);
+            categoriesList.setAdapter(new CategoryAdapter(this, liveCategories));
         });
+    }
+
+    private List<Category> sortCategories(List<Category> toBeSorted) {
+        Comparator<Category> nameOrder = (entry1, entry2) -> {
+            final String name1 = entry1.getName();
+            final String name2 = entry2.getName();
+            return name1.compareToIgnoreCase(name2);
+        };
+        Collections.sort(toBeSorted, nameOrder);
+        return toBeSorted;
     }
 
 }

@@ -92,6 +92,11 @@ public abstract class AppDatabase extends RoomDatabase {
         isDatabaseCreated.postValue(true);
     }
 
+    public void deleteCategory(final Category category) {
+        executors.diskIo().execute(() -> instance.runInTransaction(() ->
+                instance.categoryDao().delete(category)));
+    }
+
     public void deleteRecipe(final Recipe recipe) {
         executors.diskIo().execute(() -> instance.runInTransaction(() ->
                 instance.recipeDao().delete(recipe)));
@@ -124,6 +129,16 @@ public abstract class AppDatabase extends RoomDatabase {
     public void insertRecipe(final Recipe recipe) {
         executors.diskIo().execute(() -> instance.runInTransaction(() ->
                 instance.recipeDao().insert(recipe)));
+    }
+
+    public void insertCategory(final Category category) {
+        executors.diskIo().execute(() -> instance.runInTransaction(() ->
+                instance.categoryDao().insert(category)));
+    }
+
+    public void updateCategory(final Category category) {
+        executors.diskIo().execute(() -> instance.runInTransaction(() ->
+                instance.categoryDao().update(category)));
     }
 
     public void updateRecipe(final Recipe recipe) {

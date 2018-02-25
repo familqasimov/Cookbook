@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation.view;
+package com.github.jnuutinen.cookbook.presentation.viewrecipe;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;

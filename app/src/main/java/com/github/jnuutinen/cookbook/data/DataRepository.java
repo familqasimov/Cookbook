@@ -45,6 +45,10 @@ public class DataRepository {
         return instance;
     }
 
+    public void deleteCategory(Category category) {
+        instance.appDatabase.deleteCategory(category);
+    }
+
     public void deleteRecipe(Recipe recipe) {
         instance.appDatabase.deleteRecipe(recipe);
     }
@@ -57,8 +61,16 @@ public class DataRepository {
         return observableRecipes;
     }
 
-    public void saveRecipe(Recipe recipe) {
+    public void insertRecipe(Recipe recipe) {
         instance.appDatabase.insertRecipe(recipe);
+    }
+
+    public void insertCategory(Category category) {
+        instance.appDatabase.insertCategory(category);
+    }
+
+    public void updateCategory(Category category) {
+        instance.appDatabase.updateCategory(category);
     }
 
     public void updateRecipe(Recipe recipe) {

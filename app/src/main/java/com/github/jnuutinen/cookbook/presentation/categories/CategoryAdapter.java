@@ -1,4 +1,5 @@
-package com.github.jnuutinen.cookbook.presentation.main;
+package com.github.jnuutinen.cookbook.presentation.categories;
+
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,21 +10,21 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
-import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
 
 import java.util.List;
 
-class RecipeAdapter extends ArrayAdapter<Recipe> {
+public class CategoryAdapter extends ArrayAdapter<Category> {
 
-    RecipeAdapter(Context context, List<Recipe> recipes) {
-        super(context, 0, recipes);
+    CategoryAdapter(Context context, List<Category> categories) {
+        super(context, 0, categories);
     }
 
     @Override
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
-        Recipe recipe = getItem(position);
+        Category category = getItem(position);
 
         ViewHolder viewHolder;
         if (convertView == null) {
@@ -32,27 +33,18 @@ class RecipeAdapter extends ArrayAdapter<Recipe> {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.item_recipe, parent, false);
             viewHolder.name = convertView.findViewById(R.id.text_recipe_name);
-            viewHolder.category = convertView.findViewById(R.id.text_recipe_category);
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        if (recipe != null) {
-            viewHolder.name.setText(recipe.getName());
-            if (recipe.getCategoryId() == null) {
-                viewHolder.category.setText(R.string.recipe_no_category);
-            } else {
-                // TODO: set category name instead of id
-                viewHolder.category.setText(String.valueOf(recipe.getCategoryId()));
-            }
+        if (category != null) {
+            viewHolder.name.setText(category.getName());
         }
         return convertView;
     }
 
     private static class ViewHolder {
         TextView name;
-        TextView category;
     }
-
 }

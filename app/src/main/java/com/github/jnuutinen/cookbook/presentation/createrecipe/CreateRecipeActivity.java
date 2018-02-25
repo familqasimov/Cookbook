@@ -1,8 +1,9 @@
-package com.github.jnuutinen.cookbook.presentation.create;
+package com.github.jnuutinen.cookbook.presentation.createrecipe;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
@@ -37,7 +38,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
     private CreateRecipeViewModel viewModel;
     private ArrayList<String> ingredients;
-    private String category;
+    private Integer categoryId;
     private String name;
     private String instructions;
 
@@ -67,7 +68,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
             saveRecipe();
-            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -84,7 +84,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
     private void getRecipeInfo() {
         ingredients = new ArrayList<>();
-        category = ((Category) spinnerCategory.getSelectedItem()).getName();
+        categoryId = ((Category) spinnerCategory.getSelectedItem()).getId();
         name = editTextName.getText().toString().trim();
         instructions = editTextInstructions.getText().toString().trim();
         for (int i = 0; i < table.getChildCount(); i++) {
@@ -117,10 +117,15 @@ public class CreateRecipeActivity extends AppCompatActivity {
     }
 
     private void saveRecipe() {
-        getRecipeInfo();
-        // TODO: get category id
-        Recipe recipe = new Recipe(name, null, ingredients, instructions);
-        viewModel.insertRecipe(recipe);
-        setResult(RESULT_OK, new Intent());
+        if (editTextName.getText().toString().trim().length() == 0) {
+            Snackbar.make(editTextName, R.string.alert_blank_recipe_name, Snackbar.LENGTH_LONG)
+                    .show();
+        } else {
+            getRecipeInfo();
+            Recipe recipe = new Recipe(name, categoryId, ingredients, instructions);
+            viewModel.insertRecipe(recipe);
+            setResult(RESULT_OK, new Intent());
+            finish();
+        }
     }
 }

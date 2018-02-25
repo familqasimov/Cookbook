@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.create.CreateRecipeActivity"
+            android:name=".presentation.createrecipe.CreateRecipeActivity"
             android:label="@string/title_activity_create_recipe"
             android:parentActivityName=".presentation.main.MainActivity"
             android:theme="@style/TestTheme1.NoActionBar">
@@ -32,7 +32,7 @@
                 android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
         </activity>
         <activity
-            android:name=".presentation.view.ViewRecipeActivity"
+            android:name=".presentation.viewrecipe.ViewRecipeActivity"
             android:label="@string/title_activity_view_recipe"
             android:parentActivityName=".presentation.main.MainActivity"
             android:theme="@style/TestTheme1.NoActionBar">
@@ -41,13 +41,31 @@
                 android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
         </activity>
         <activity
-            android:name=".presentation.edit.EditRecipeActivity"
+            android:name=".presentation.editrecipe.EditRecipeActivity"
             android:label="@string/title_activity_edit_recipe"
-            android:parentActivityName=".presentation.view.ViewRecipeActivity"
+            android:parentActivityName=".presentation.viewrecipe.ViewRecipeActivity"
             android:theme="@style/TestTheme1.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.jnuutinen.cookbook.presentation.view.ViewRecipeActivity" />
+                android:value="com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity" />
+        </activity>
+        <activity
+            android:name=".presentation.categories.CategoriesActivity"
+            android:label="@string/title_activity_edit_categories"
+            android:parentActivityName=".presentation.main.MainActivity"
+            android:theme="@style/TestTheme1.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
+        </activity>
+        <activity
+            android:name=".presentation.editcategory.EditCategoryActivity"
+            android:label="@string/title_activity_edit_category"
+            android:parentActivityName=".presentation.categories.CategoriesActivity"
+            android:theme="@style/TestTheme1.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity" />
         </activity>
     </application>
 

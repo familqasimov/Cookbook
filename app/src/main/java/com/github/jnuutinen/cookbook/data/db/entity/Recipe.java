@@ -1,5 +1,6 @@
 package com.github.jnuutinen.cookbook.data.db.entity;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
@@ -11,18 +12,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
-import static android.arch.persistence.room.ForeignKey.SET_DEFAULT;
+import static android.arch.persistence.room.ForeignKey.SET_NULL;
 
-@Entity(foreignKeys = @ForeignKey(entity = Category.class,
-                                  parentColumns = "id",
-                                  childColumns = "categoryId",
-                                  onUpdate = CASCADE,
-                                  onDelete = SET_DEFAULT))
+@Entity(foreignKeys = @ForeignKey(entity = Category.class,      // Foreign key points to a category
+                                  parentColumns = "id",         // 'id' column in category table
+                                  childColumns = "category_id", // 'category_id' column in recipe
+                                  onUpdate = CASCADE,           // If updated in category, update fk too
+                                  onDelete = SET_NULL))         // If category deleted, set recipe fk null
 public class Recipe implements Parcelable {
+    private static final int NULL_INTEGER_FLAG = 0;
+    private static final int NONNULL_INTEGER_FLAG = 1;
+
     @PrimaryKey(autoGenerate = true)
     private Integer id;
     private String name;
-    private Integer categoryId = 0;
+    @ColumnInfo(name = "category_id")
+    private Integer categoryId;
     private List<String> ingredients;
     private String instructions;
 
@@ -41,7 +46,7 @@ public class Recipe implements Parcelable {
     private Recipe(Parcel in) {
         id = in.readInt();
         name = in.readString();
-        categoryId = in.readInt();
+        categoryId = readInteger(in);
         ingredients = new ArrayList<>();
         in.readStringList(ingredients);
         instructions = in.readString();
@@ -68,9 +73,38 @@ public class Recipe implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(name);
-        dest.writeInt(categoryId);
+        writeInteger(dest, categoryId);
         dest.writeStringList(ingredients);
         dest.writeString(instructions);
+    }
+
+    /**
+     * Handles Nullable Integer writing to parcel
+     * @param dest Parcel to write into
+     * @param i Nullable Integer to write to parcel
+     */
+    private static void writeInteger(Parcel dest, Integer i) {
+        if (i != null) {
+            dest.writeInt(NONNULL_INTEGER_FLAG);
+            dest.writeInt(i);
+        }
+        else {
+            dest.writeInt(NULL_INTEGER_FLAG);
+        }
+    }
+
+    /**
+     * Handles Nullable Integer reading from parcel
+     * @param in Parcel to read from
+     * @return Nullable Integer read from parcel
+     */
+    private static Integer readInteger(Parcel in) {
+        if (in.readInt() != NULL_INTEGER_FLAG) {
+            return in.readInt();
+        }
+        else {
+            return null;
+        }
     }
 
     public Integer getId() {

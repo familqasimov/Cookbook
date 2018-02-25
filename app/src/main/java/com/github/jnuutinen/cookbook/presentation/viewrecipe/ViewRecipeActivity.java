@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation.view;
+package com.github.jnuutinen.cookbook.presentation.viewrecipe;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
-import com.github.jnuutinen.cookbook.presentation.edit.EditRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.editrecipe.EditRecipeActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -76,8 +76,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_EDIT_RECIPE:
                 if (resultCode == RESULT_OK) {
-                    Snackbar.make(name, R.string.alert_recipe_saved, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.alert_recipe_saved, null).show();
+                    Snackbar.make(name, R.string.alert_recipe_saved, Snackbar.LENGTH_LONG).show();
                 }
                 recipe = data.getParcelableExtra("recipe");
                 getRecipe();
@@ -118,8 +117,12 @@ public class ViewRecipeActivity extends AppCompatActivity {
 
     private void getRecipe() {
         name.setText(recipe.getName());
-        // TODO: category
-        category.setText("");
+        // TODO: set category name instead of id
+        if (recipe.getCategoryId() == null) {
+            category.setText(R.string.recipe_no_category);
+        } else {
+            category.setText(String.valueOf(recipe.getCategoryId()));
+        }
         ingredients.setText("");
         for (int i = 0; i < recipe.getIngredients().size(); i++) {
             ingredients.append(recipe.getIngredients().get(i) + "\n");

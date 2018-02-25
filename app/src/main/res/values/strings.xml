@@ -15,7 +15,7 @@
     <string name="action_cancel">Cancel</string>
     <string name="create_recipe_cancel">Discard changes?</string>
     <string name="yes">Yes</string>
-    <string name="recipe_no_category">No categoryId</string>
+    <string name="recipe_no_category">No category</string>
     <string name="title_activity_view_recipe">View Recipe</string>
     <string name="action_edit_recipe">Edit recipe</string>
     <string name="action_delete_recipe">Delete recipe</string>
@@ -27,4 +27,13 @@
     <string name="action_sort">Sort</string>
     <string name="title_sorted_by_name">Sorted by name</string>
     <string name="title_sorted_by_category">Sorted by categoryId</string>
+    <string name="title_activity_edit_categories">Edit categories</string>
+    <string name="action_categories">Categories</string>
+    <string name="title_activity_edit_category">"Editing category: "</string>
+    <string name="category_name_hint">Category name</string>
+    <string name="alert_delete_category">Delete category?</string>
+    <string name="alert_blank_recipe_name">Recipe name can\'t be blank!</string>
+    <string name="alert_blank_category_name">Category name can\'t be blank!</string>
+    <string name="action_delete">Delete</string>
+    <string name="title_create_category">Create category</string>
 </resources>

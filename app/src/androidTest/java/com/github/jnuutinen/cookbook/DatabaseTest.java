@@ -105,7 +105,7 @@ public class DatabaseTest {
 
         // Affected recipes' category id should be 0
         assertNotNull(recipeDao.getByName("recipe_3"));
-        assertEquals((Integer) 0, recipeDao.getByName("recipe_3").getCategoryId());
+        assertNull(recipeDao.getByName("recipe_3").getCategoryId());
     }
 
     @Test

@@ -1,8 +1,9 @@
-package com.github.jnuutinen.cookbook.presentation.edit;
+package com.github.jnuutinen.cookbook.presentation.editrecipe;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
@@ -38,7 +39,7 @@ public class EditRecipeActivity extends AppCompatActivity {
     private Recipe recipe;
     private EditRecipeViewModel viewModel;
     private ArrayList<String> ingredients;
-    private String categoryName;
+    private Integer categoryId;
     private String name;
     private String instructions;
 
@@ -54,6 +55,7 @@ public class EditRecipeActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(EditRecipeViewModel.class);
         observe();
         recipe = getIntent().getParcelableExtra("recipe");
+        setTitle(recipe.getName());
         populate();
     }
 
@@ -77,7 +79,6 @@ public class EditRecipeActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_save) {
             updateRecipe();
-            finish();
             return true;
         } else if (id == android.R.id.home) {
             Intent intent = new Intent();
@@ -99,9 +100,9 @@ public class EditRecipeActivity extends AppCompatActivity {
     }
 
     private void getRecipeInfo() {
-        ingredients = new ArrayList<>();
-        categoryName = ((Category) spinnerCategory.getSelectedItem()).getName();
         name = editTextName.getText().toString().trim();
+        ingredients = new ArrayList<>();
+        categoryId = ((Category) spinnerCategory.getSelectedItem()).getId();
         instructions = editTextInstructions.getText().toString().trim();
         for (int i = 0; i < table.getChildCount(); i++) {
             View view = table.getChildAt(i);
@@ -159,15 +160,20 @@ public class EditRecipeActivity extends AppCompatActivity {
     }
 
     private void updateRecipe() {
-        getRecipeInfo();
-        recipe.setName(name);
-        // TODO: get category id
-        recipe.setCategoryId(null);
-        recipe.setIngredients(ingredients);
-        recipe.setInstructions(instructions);
-        viewModel.updateRecipe(recipe);
-        Intent intent = new Intent();
-        intent.putExtra("recipe", recipe);
-        setResult(RESULT_OK, intent);
+        if (editTextName.getText().toString().trim().length() == 0) {
+            Snackbar.make(editTextName, R.string.alert_blank_recipe_name, Snackbar.LENGTH_LONG)
+                    .show();
+        } else {
+            getRecipeInfo();
+            recipe.setName(name);
+            recipe.setCategoryId(categoryId);
+            recipe.setIngredients(ingredients);
+            recipe.setInstructions(instructions);
+            viewModel.updateRecipe(recipe);
+            Intent intent = new Intent();
+            intent.putExtra("recipe", recipe);
+            setResult(RESULT_OK, intent);
+            finish();
+        }
     }
 }

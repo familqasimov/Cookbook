@@ -14,8 +14,9 @@ import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
-import com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity;
-import com.github.jnuutinen.cookbook.presentation.view.ViewRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity;
+import com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -76,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.action_sort) {
             sortDialog.show();
+            return true;
+        } else if (id == R.id.action_categories) {
+            startActivity(new Intent(this, CategoriesActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

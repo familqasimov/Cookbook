@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation.edit;
+package com.github.jnuutinen.cookbook.presentation.createrecipe;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -12,24 +12,21 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
-
-public class EditRecipeViewModel extends AndroidViewModel {
+public class CreateRecipeViewModel extends AndroidViewModel {
     private final LiveData<List<Category>> observableCategories;
-    private final LiveData<List<Recipe>> observableRecipes;
     private DataRepository dataRepository;
 
-     public EditRecipeViewModel(@NonNull Application application) {
+    public CreateRecipeViewModel(@NonNull Application application) {
         super(application);
         dataRepository = ((CookbookApp) application).getRepository();
         observableCategories = dataRepository.getLiveCategories();
-        observableRecipes = dataRepository.getLiveRecipes();
     }
 
     LiveData<List<Category>> getCategories() {
         return observableCategories;
     }
 
-    void updateRecipe(Recipe recipe) {
-        dataRepository.updateRecipe(recipe);
+    void insertRecipe(Recipe recipe) {
+        dataRepository.insertRecipe(recipe);
     }
 }

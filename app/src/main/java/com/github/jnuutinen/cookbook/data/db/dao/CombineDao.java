@@ -10,8 +10,8 @@ import java.util.List;
 @Dao
 public interface CombineDao {
 
-    @Query("SELECT recipe.name AS recipeName, category.name AS categoryName FROM recipe, category "
-            + "WHERE recipe.category_id = category.id")
+    @Query("SELECT recipe.name AS recipeName, category.name AS categoryName FROM recipe "
+            + "LEFT OUTER JOIN category ON recipe.category_id = category.id")
     LiveData<List<combinedRecipe>> getCombinedRecipes();
 
     class combinedRecipe {

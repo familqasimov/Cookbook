@@ -11,13 +11,12 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
 import static android.arch.persistence.room.ForeignKey.SET_NULL;
 
 @Entity(foreignKeys = @ForeignKey(entity = Category.class,      // Foreign key points to a category
                                   parentColumns = "id",         // 'id' column in category table
                                   childColumns = "category_id", // 'category_id' column in recipe
-                                  onUpdate = CASCADE,           // If updated in category, update fk too
+                                  //onUpdate = CASCADE,           // If updated in category, update fk too
                                   onDelete = SET_NULL))         // If category deleted, set recipe fk null
 public class Recipe implements Parcelable {
     private static final int NULL_INTEGER_FLAG = 0;

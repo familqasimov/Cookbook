@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 
 import com.github.jnuutinen.cookbook.data.db.AppDatabase;
+import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
@@ -15,11 +16,13 @@ public class DataRepository {
     private final AppDatabase appDatabase;
     private MediatorLiveData<List<Recipe>> observableRecipes;
     private MediatorLiveData<List<Category>> observableCategories;
+    private MediatorLiveData<List<CombineDao.combinedRecipe>> observableCombinedRecipes;
 
     private DataRepository(final AppDatabase appDatabase) {
         this.appDatabase = appDatabase;
         observableRecipes = new MediatorLiveData<>();
         observableCategories = new MediatorLiveData<>();
+        observableCombinedRecipes = new MediatorLiveData<>();
         observableRecipes.addSource(appDatabase.getAllLiveRecipes(),
                 recipeEntities -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
@@ -30,6 +33,12 @@ public class DataRepository {
                 categoryEntities -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
                         observableCategories.postValue(categoryEntities);
+                    }
+                });
+        observableCombinedRecipes.addSource(appDatabase.getCombinedRecipes(),
+                combinedRecipes -> {
+                    if (appDatabase.getDatabaseCreated().getValue() != null) {
+                        observableCombinedRecipes.postValue(combinedRecipes);
                     }
                 });
     }
@@ -59,6 +68,10 @@ public class DataRepository {
 
     public LiveData<List<Recipe>> getLiveRecipes() {
         return observableRecipes;
+    }
+
+    public LiveData<List<CombineDao.combinedRecipe>> getLiveCombinedRecipes() {
+        return observableCombinedRecipes;
     }
 
     public void insertRecipe(Recipe recipe) {

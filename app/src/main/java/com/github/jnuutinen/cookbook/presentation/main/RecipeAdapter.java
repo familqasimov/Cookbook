@@ -9,13 +9,13 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
-import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
+import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 
 import java.util.List;
 
-class RecipeAdapter extends ArrayAdapter<Recipe> {
+class RecipeAdapter extends ArrayAdapter<CombineDao.combinedRecipe> {
 
-    RecipeAdapter(Context context, List<Recipe> recipes) {
+    RecipeAdapter(Context context, List<CombineDao.combinedRecipe> recipes) {
         super(context, 0, recipes);
     }
 
@@ -23,7 +23,7 @@ class RecipeAdapter extends ArrayAdapter<Recipe> {
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
 
-        Recipe recipe = getItem(position);
+        CombineDao.combinedRecipe recipe = getItem(position);
 
         ViewHolder viewHolder;
         if (convertView == null) {
@@ -39,12 +39,11 @@ class RecipeAdapter extends ArrayAdapter<Recipe> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         if (recipe != null) {
-            viewHolder.name.setText(recipe.getName());
-            if (recipe.getCategoryId() == null) {
+            viewHolder.name.setText(recipe.recipeName);
+            if (recipe.categoryName == null) {
                 viewHolder.category.setText(R.string.recipe_no_category);
             } else {
-                // TODO: set category name instead of id
-                viewHolder.category.setText(String.valueOf(recipe.getCategoryId()));
+                viewHolder.category.setText(recipe.categoryName);
             }
         }
         return convertView;

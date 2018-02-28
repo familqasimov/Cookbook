@@ -13,8 +13,11 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
+import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.editrecipe.EditRecipeActivity;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,6 +32,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
     @BindView(R.id.text_view_instructions) TextView instructions;
 
     private AlertDialog deleteDialog;
+    private List<CombineDao.combinedRecipe> liveCombinedRecipes;
     private Recipe recipe;
     private ViewRecipeViewModel viewModel;
 
@@ -45,6 +49,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
         buildDeleteDialog();
         //noinspection ConstantConditions
         recipe = getIntent().getParcelableExtra("recipe");
+        observe();
         setTitle(recipe.getName());
         getRecipe();
     }
@@ -117,16 +122,28 @@ public class ViewRecipeActivity extends AppCompatActivity {
 
     private void getRecipe() {
         name.setText(recipe.getName());
-        // TODO: set category name instead of id
-        if (recipe.getCategoryId() == null) {
-            category.setText(R.string.recipe_no_category);
-        } else {
-            category.setText(String.valueOf(recipe.getCategoryId()));
-        }
+        // Category is set in observe(), when LiveData is fetched
         ingredients.setText("");
         for (int i = 0; i < recipe.getIngredients().size(); i++) {
             ingredients.append(recipe.getIngredients().get(i) + "\n");
         }
         instructions.setText(recipe.getInstructions());
+    }
+
+    private void observe() {
+        viewModel.getLiveCombinedRecipes().observe(this, liveCombinedRecipes -> {
+            this.liveCombinedRecipes = liveCombinedRecipes;
+            if (liveCombinedRecipes != null) {
+                for (CombineDao.combinedRecipe combined : liveCombinedRecipes) {
+                    if (combined.recipeName.equals(recipe.getName())) {
+                        if (combined.categoryName == null) {
+                            category.setText(R.string.recipe_no_category);
+                        } else {
+                            category.setText(combined.categoryName);
+                        }
+                    }
+                }
+            }
+        });
     }
 }

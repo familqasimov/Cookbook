@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
+import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity;
 import com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.text_sort) TextView sortText;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
+    private List<CombineDao.combinedRecipe> liveCombinedRecipes;
     private List<Recipe> liveRecipes;
     private RecipeAdapter adapter;
     private AlertDialog sortDialog;
@@ -108,8 +110,20 @@ public class MainActivity extends AppCompatActivity {
     @OnItemClick(R.id.list_recipes)
     void viewRecipe(int position) {
         Intent intent = new Intent(this, ViewRecipeActivity.class);
-        intent.putExtra("recipe", liveRecipes.get(position));
-        startActivityForResult(intent, REQUEST_VIEW_RECIPE);
+        CombineDao.combinedRecipe combined = liveCombinedRecipes.get(position);
+        if (liveRecipes != null) {
+            Recipe foundRecipe = null;
+            for (Recipe recipe : liveRecipes) {
+                if (recipe.getName().equals(combined.recipeName)) {
+                    foundRecipe = recipe;
+                    break;
+                }
+            }
+            if (foundRecipe != null) {
+                intent.putExtra("recipe", foundRecipe);
+                startActivityForResult(intent, REQUEST_VIEW_RECIPE);
+            }
+        }
     }
 
     private void createSortDialog() {
@@ -131,31 +145,32 @@ public class MainActivity extends AppCompatActivity {
 
     private void observe() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        viewModel.getRecipes().observe(this, recipes -> {
-            if (recipes != null) {
-                if (recipes.size() > 0) {
+        viewModel.getRecipes().observe(this, recipes -> liveRecipes = recipes);
+
+        viewModel.getCombinedRecipes().observe(this, combinedRecipes -> {
+            if (combinedRecipes != null) {
+                if (combinedRecipes.size() > 0) {
                     noRecipesText.setVisibility(View.GONE);
                     sortText.setVisibility(View.VISIBLE);
                 }
             }
-            liveRecipes = sortRecipes(recipes);
-            adapter = new RecipeAdapter(this, recipes);
-                    recipeList.setAdapter(adapter);
-                }
-        );
+            liveCombinedRecipes = sortRecipes(combinedRecipes);
+            adapter = new RecipeAdapter(this, combinedRecipes);
+            recipeList.setAdapter(adapter);
+        });
     }
 
-    private List<Recipe> sortRecipes(List<Recipe> toBeSorted) {
+    private List<CombineDao.combinedRecipe> sortRecipes(List<CombineDao.combinedRecipe> toBeSorted) {
         // name order comparator
-        Comparator<Recipe> nameOrder = (entry1, entry2) -> {
-            final String name1 = entry1.getName();
-            final String name2 = entry2.getName();
+        Comparator<CombineDao.combinedRecipe> nameOrder = (entry1, entry2) -> {
+            final String name1 = entry1.recipeName;
+            final String name2 = entry2.recipeName;
             return name1.compareToIgnoreCase(name2);
         };
         // category order comparator
-        Comparator<Recipe> catOrder = (entry1, entry2) -> {
-            final Integer cat1 = entry1.getCategoryId();
-            final Integer cat2 = entry2.getCategoryId();
+        Comparator<CombineDao.combinedRecipe> catOrder = (entry1, entry2) -> {
+            final String cat1 = entry1.categoryName;
+            final String cat2 = entry2.categoryName;
             if (cat1 == null && cat2 == null) {
                 return 0;
             } else if (cat1 == null) {

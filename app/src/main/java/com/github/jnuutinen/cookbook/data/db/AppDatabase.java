@@ -14,6 +14,7 @@ import android.support.annotation.VisibleForTesting;
 import com.github.jnuutinen.cookbook.AppExecutors;
 import com.github.jnuutinen.cookbook.data.db.converter.ListConverter;
 import com.github.jnuutinen.cookbook.data.db.dao.CategoryDao;
+import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.dao.RecipeDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
@@ -78,6 +79,9 @@ public abstract class AppDatabase extends RoomDatabase {
     @VisibleForTesting
     public abstract CategoryDao categoryDao();
 
+    @VisibleForTesting
+    public abstract CombineDao combineDao();
+
     public LiveData<Boolean> getDatabaseCreated() {
         return isDatabaseCreated;
     }
@@ -116,6 +120,10 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public LiveData<List<Recipe>> getAllLiveRecipes() {
         return recipeDao().liveGetAll();
+    }
+
+    public LiveData<List<CombineDao.combinedRecipe>> getCombinedRecipes() {
+        return combineDao().getCombinedRecipes();
     }
 
     public Category getCategoryByName(String name) {

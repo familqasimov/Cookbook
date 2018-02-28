@@ -16,6 +16,8 @@ import android.widget.EditText;
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -25,6 +27,7 @@ public class EditCategoryActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.edit_category_name) EditText editTextName;
 
+    private List<Category> liveCategories;
     private AlertDialog deleteDialog;
     private EditCategoryViewModel viewModel;
     private Category category;
@@ -46,6 +49,7 @@ public class EditCategoryActivity extends AppCompatActivity {
         editTextName.setFilters(new InputFilter[]{new InputFilter.LengthFilter(40)});
         editTextName.setText(category.getName());
         buildDeleteDialog();
+        observe();
     }
 
     @Override
@@ -85,10 +89,25 @@ public class EditCategoryActivity extends AppCompatActivity {
         deleteDialog = builder.create();
     }
 
+    private void observe() {
+        viewModel.getCategories().observe(this, categories -> liveCategories = categories);
+    }
+
     private void updateCategory() {
         String categoryName = editTextName.getText().toString().trim();
         if (categoryName.length() == 0) {
             Snackbar.make(editTextName, R.string.alert_blank_category_name, Snackbar.LENGTH_LONG)
+                    .show();
+        }
+        boolean duplicateFound = false;
+        for (Category c : liveCategories) {
+            if (c.getName().toLowerCase().equals(categoryName.toLowerCase())) {
+                duplicateFound = true;
+                break;
+            }
+        }
+        if (duplicateFound) {
+            Snackbar.make(editTextName, R.string.category_name_duplicate, Snackbar.LENGTH_LONG)
                     .show();
         } else {
             category.setName(categoryName);

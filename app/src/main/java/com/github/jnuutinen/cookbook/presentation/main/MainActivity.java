@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,10 +31,12 @@ import butterknife.OnItemClick;
 public class MainActivity extends AppCompatActivity {
     //private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ADD_RECIPE = 1;
+    private static final int REQUEST_VIEW_RECIPE = 2;
     private static final int SORT_NAME = 0;
     private static final int SORT_CATEGORY = 1;
     private static int sort = SORT_NAME;
 
+    @BindView(R.id.text_no_recipes) TextView noRecipesText;
     @BindView(R.id.list_recipes) ListView recipeList;
     @BindView(R.id.text_sort) TextView sortText;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         createSortDialog();
+        noRecipesText.setVisibility(View.VISIBLE);
+        sortText.setVisibility(View.GONE);
         observe();
     }
 
@@ -66,23 +71,30 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_ADD_RECIPE:
                 if (resultCode == RESULT_OK) {
                     Snackbar.make(recipeList, R.string.alert_recipe_saved, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.alert_recipe_saved, null).show();
+                            .show();
                 }
+                break;
+            case REQUEST_VIEW_RECIPE:
+                if (resultCode == RESULT_OK) {
+                    Snackbar.make(recipeList, R.string.alert_recipe_deleted, Snackbar.LENGTH_LONG)
+                            .show();
+                }
+                break;
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == R.id.action_sort) {
-            sortDialog.show();
-            return true;
-        } else if (id == R.id.action_categories) {
-            startActivity(new Intent(this, CategoriesActivity.class));
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                break;
+            case R.id.action_sort:
+                sortDialog.show();
+                break;
+            case R.id.action_categories:
+                startActivity(new Intent(this, CategoriesActivity.class));
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -97,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     void viewRecipe(int position) {
         Intent intent = new Intent(this, ViewRecipeActivity.class);
         intent.putExtra("recipe", liveRecipes.get(position));
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_VIEW_RECIPE);
     }
 
     private void createSortDialog() {
@@ -120,6 +132,12 @@ public class MainActivity extends AppCompatActivity {
     private void observe() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         viewModel.getRecipes().observe(this, recipes -> {
+            if (recipes != null) {
+                if (recipes.size() > 0) {
+                    noRecipesText.setVisibility(View.GONE);
+                    sortText.setVisibility(View.VISIBLE);
+                }
+            }
             liveRecipes = sortRecipes(recipes);
             adapter = new RecipeAdapter(this, recipes);
                     recipeList.setAdapter(adapter);

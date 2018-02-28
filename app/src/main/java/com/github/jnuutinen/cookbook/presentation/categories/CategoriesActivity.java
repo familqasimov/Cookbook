@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
@@ -28,6 +29,7 @@ import butterknife.OnItemClick;
 public class CategoriesActivity extends AppCompatActivity {
     private static final int REQUEST_EDIT_CATEGORY = 1;
 
+    @BindView(R.id.text_no_categories) TextView noCategoriesText;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.list_categories) ListView categoriesList;
 
@@ -44,7 +46,7 @@ public class CategoriesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        noCategoriesText.setVisibility(View.VISIBLE);
         buildCreateCategoryDialog();
         observe();
     }
@@ -87,7 +89,7 @@ public class CategoriesActivity extends AppCompatActivity {
                 .inflate(R.layout.dialog_create_category, null);
         addCategoryDialog = builder.setView(dialogView)
                 .setMessage(R.string.title_create_category)
-                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                .setPositiveButton(R.string.action_save, (dialog, which) -> {
                     String categoryName = ((EditText) dialogView
                             .findViewById(R.id.edit_category_name)).getText().toString().trim();
                     if (categoryName.length() == 0) {
@@ -119,6 +121,11 @@ public class CategoriesActivity extends AppCompatActivity {
     private void observe() {
         viewModel = ViewModelProviders.of(this).get(CategoriesViewModel.class);
         viewModel.getCategories().observe(this, categories -> {
+            if (categories != null) {
+                if (categories.size() != 0) {
+                    noCategoriesText.setVisibility(View.GONE);
+                }
+            }
             liveCategories = sortCategories(categories);
             categoriesList.setAdapter(new CategoryAdapter(this, liveCategories));
         });

@@ -8,6 +8,17 @@
     tools:context="com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity"
     tools:showIn="@layout/activity_categories">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_no_categories"
+        android:paddingTop="8dp"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/title_no_categories"
+        android:visibility="gone"/>
+
     <ListView
         android:id="@+id/list_categories"
         android:layout_width="0dp"

@@ -9,6 +9,17 @@
     tools:showIn="@layout/activity_main">
 
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_no_recipes"
+        android:paddingTop="8dp"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/title_no_recipes"
+        android:visibility="gone"/>
+
+    <TextView
         android:id="@+id/text_sort"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

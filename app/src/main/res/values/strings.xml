@@ -26,7 +26,7 @@
     <string name="alert_sort_recipes">Sort recipes by:</string>
     <string name="action_sort">Sort</string>
     <string name="title_sorted_by_name">Sorted by name</string>
-    <string name="title_sorted_by_category">Sorted by categoryId</string>
+    <string name="title_sorted_by_category">Sorted by category</string>
     <string name="title_activity_edit_categories">Edit categories</string>
     <string name="action_categories">Categories</string>
     <string name="title_activity_edit_category">"Editing category: "</string>
@@ -39,4 +39,7 @@
     <string name="category_name_duplicate">There\'s already a category with that name!</string>
     <string name="alert_category_saved">Category saved!</string>
     <string name="alert_category_deleted">Category deleted!</string>
+    <string name="alert_recipe_deleted">Recipe deleted!</string>
+    <string name="title_no_categories">No categories found. Tap the plus button to add one!</string>
+    <string name="title_no_recipes">No recipes found. Tap the plus button to add one!</string>
 </resources>

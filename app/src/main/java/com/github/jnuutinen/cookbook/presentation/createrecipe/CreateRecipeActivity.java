@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -34,6 +35,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.edit_name) EditText editTextName;
     @BindView(R.id.edit_instructions) EditText editTextInstructions;
+    @BindView(R.id.checkbox_category) CheckBox categoryCheckBox;
     @BindView(R.id.spinner_category) Spinner spinnerCategory;
 
     private CreateRecipeViewModel viewModel;
@@ -52,6 +54,13 @@ public class CreateRecipeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         viewModel = ViewModelProviders.of(this).get(CreateRecipeViewModel.class);
         populateCategoriesSpinner();
+        categoryCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                spinnerCategory.setVisibility(View.VISIBLE);
+            } else {
+                spinnerCategory.setVisibility(View.GONE);
+            }
+        });
         newRow();
     }
 
@@ -84,7 +93,11 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
     private void getRecipeInfo() {
         ingredients = new ArrayList<>();
-        categoryId = ((Category) spinnerCategory.getSelectedItem()).getId();
+        if (categoryCheckBox.isChecked()) {
+            categoryId = ((Category) spinnerCategory.getSelectedItem()).getId();
+        } else {
+            categoryId = null;
+        }
         name = editTextName.getText().toString().trim();
         instructions = editTextInstructions.getText().toString().trim();
         for (int i = 0; i < table.getChildCount(); i++) {

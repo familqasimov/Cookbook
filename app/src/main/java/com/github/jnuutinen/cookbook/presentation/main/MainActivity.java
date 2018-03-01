@@ -174,9 +174,9 @@ public class MainActivity extends AppCompatActivity {
             if (cat1 == null && cat2 == null) {
                 return 0;
             } else if (cat1 == null) {
-                return -1;
-            } else if (cat2 == null) {
                 return 1;
+            } else if (cat2 == null) {
+                return -1;
             }
             return cat1.compareTo(cat2);
         };

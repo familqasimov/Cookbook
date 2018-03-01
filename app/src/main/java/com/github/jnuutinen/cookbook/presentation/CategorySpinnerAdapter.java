@@ -32,7 +32,6 @@ public class CategorySpinnerAdapter extends ArrayAdapter<Category> {
     @Override
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-
         // Get recipe item for this position
         Category category = getItem(position);
 

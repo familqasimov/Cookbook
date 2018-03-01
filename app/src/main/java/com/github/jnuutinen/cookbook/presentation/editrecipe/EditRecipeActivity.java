@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -22,6 +23,7 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.CategorySpinnerAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,7 +36,9 @@ public class EditRecipeActivity extends AppCompatActivity {
     @BindView(R.id.edit_name) EditText editTextName;
     @BindView(R.id.edit_instructions) EditText editTextInstructions;
     @BindView(R.id.spinner_category) Spinner spinnerCategory;
+    @BindView(R.id.checkbox_category) CheckBox categoryCheckBox;
 
+    private List<Category> liveCategories;
     private CategorySpinnerAdapter adapter;
     private Recipe recipe;
     private EditRecipeViewModel viewModel;
@@ -55,6 +59,13 @@ public class EditRecipeActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(EditRecipeViewModel.class);
         observe();
         recipe = getIntent().getParcelableExtra("recipe");
+        categoryCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                spinnerCategory.setVisibility(View.VISIBLE);
+            } else {
+                spinnerCategory.setVisibility(View.GONE);
+            }
+        });
         setTitle(recipe.getName());
         populate();
     }
@@ -131,7 +142,14 @@ public class EditRecipeActivity extends AppCompatActivity {
     private void populate() {
         editTextName.setText(recipe.getName());
         editTextInstructions.setText(recipe.getInstructions());
-        // Spinner selection set with callback when livedata is fetched
+        categoryId = recipe.getCategoryId();
+        if (categoryId == null) {
+            categoryCheckBox.setChecked(false);
+            spinnerCategory.setVisibility(View.GONE);
+        } else {
+            categoryCheckBox.setChecked(true);
+            spinnerCategory.setVisibility(View.VISIBLE);
+        }
 
         // Ingredient rows
         for (int i = 0; i < recipe.getIngredients().size(); i++) {
@@ -154,8 +172,19 @@ public class EditRecipeActivity extends AppCompatActivity {
 
     private void observe() {
         viewModel.getCategories().observe(this, categories -> {
+            liveCategories = categories;
             adapter = new CategorySpinnerAdapter(this, categories);
             spinnerCategory.setAdapter(adapter);
+            if (recipe.getCategoryId() != null) {
+                categoryCheckBox.setChecked(true);
+                spinnerCategory.setVisibility(View.VISIBLE);
+                for (Category c : liveCategories) {
+                    if ((int)c.getId() == recipe.getCategoryId()) {
+                        spinnerCategory.setSelection(adapter.getPosition(c));
+                        break;
+                    }
+                }
+            }
         });
     }
 

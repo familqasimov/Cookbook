@@ -7,9 +7,12 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -29,6 +32,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 
+import static android.view.View.GONE;
+
 public class MainActivity extends AppCompatActivity {
     //private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ADD_RECIPE = 1;
@@ -37,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int SORT_CATEGORY = 1;
     private static int sort = SORT_NAME;
 
+    @BindView(R.id.edit_search_recipe) EditText searchEditText;
     @BindView(R.id.text_no_recipes) TextView noRecipesText;
     @BindView(R.id.list_recipes) ListView recipeList;
     @BindView(R.id.text_sort) TextView sortText;
@@ -56,8 +62,19 @@ public class MainActivity extends AppCompatActivity {
 
         createSortDialog();
         noRecipesText.setVisibility(View.VISIBLE);
-        sortText.setVisibility(View.GONE);
+        sortText.setVisibility(GONE);
         observe();
+
+        searchEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                searchEditText.setVisibility(View.VISIBLE);
+                searchEditText.requestFocus();
+            } else {
+                searchEditText.setText("");
+                searchEditText.setVisibility(GONE);
+            }
+        });
+        makeSearchListener();
     }
 
     @Override
@@ -89,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            case R.id.action_search:
+                toggleSearch();
+                break;
             case R.id.action_settings:
                 break;
             case R.id.action_sort:
@@ -143,6 +163,25 @@ public class MainActivity extends AppCompatActivity {
         sortDialog = builder.create();
     }
 
+    private void makeSearchListener() {
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Do nothing
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    adapter.getFilter().filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Do nothing
+            }
+        });
+    }
+
     private void observe() {
         MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         viewModel.getRecipes().observe(this, recipes -> liveRecipes = recipes);
@@ -150,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getCombinedRecipes().observe(this, combinedRecipes -> {
             if (combinedRecipes != null) {
                 if (combinedRecipes.size() > 0) {
-                    noRecipesText.setVisibility(View.GONE);
+                    noRecipesText.setVisibility(GONE);
                     sortText.setVisibility(View.VISIBLE);
                 }
             }
@@ -158,6 +197,16 @@ public class MainActivity extends AppCompatActivity {
             adapter = new RecipeAdapter(this, combinedRecipes);
             recipeList.setAdapter(adapter);
         });
+    }
+
+    private void toggleSearch() {
+        if (searchEditText.getVisibility() == View.VISIBLE) {
+            searchEditText.setText("");
+            searchEditText.setVisibility(View.GONE);
+        } else {
+            searchEditText.setVisibility(View.VISIBLE);
+            searchEditText.requestFocus();
+        }
     }
 
     private List<CombineDao.combinedRecipe> sortRecipes(List<CombineDao.combinedRecipe> toBeSorted) {

@@ -61,7 +61,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
                 spinnerCategory.setVisibility(View.GONE);
             }
         });
-        newRow();
+        newRow(false);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     }
 
     public void newRow(View view) {
-        newRow();
+        newRow(true);
     }
 
     public void removeRow(View view) {
@@ -110,7 +110,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         }
     }
 
-    private void newRow() {
+    private void newRow(boolean tapped) {
         TableRow row = new TableRow(this);
         TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
         lp.setMargins(16, 16, 16, 16);
@@ -121,6 +121,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
         ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
         ingredient.setMaxLines(2);
         row.addView(ingredient);
+        if (tapped) {
+            ingredient.requestFocus();
+        }
         table.addView(row);
     }
 

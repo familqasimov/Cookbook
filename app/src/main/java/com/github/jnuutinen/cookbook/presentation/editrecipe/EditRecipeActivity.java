@@ -136,6 +136,7 @@ public class EditRecipeActivity extends AppCompatActivity {
         ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
         ingredient.setMaxLines(2);
         row.addView(ingredient);
+        ingredient.requestFocus();
         table.addView(row);
     }
 

@@ -45,4 +45,9 @@
     <string name="search_hint">Search</string>
     <string name="action_edit_category">Edit category</string>
     <string name="title_edit_category">Edit category</string>
+    <string name="title_activity_about">About</string>
+    <string name="action_license">License</string>
+    <string name="text_about_app">A simple open source Cookbook app.</string>
+    <string name="text_about_url">https://github.com/JNuutinen/Cookbook</string>
+    <string name="action_about">About</string>
 </resources>

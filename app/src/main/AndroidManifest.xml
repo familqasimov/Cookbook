@@ -58,6 +58,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
         </activity>
+        <activity
+            android:name=".presentation.about.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:parentActivityName=".presentation.main.MainActivity"
+            android:theme="@style/TestTheme1.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
+import com.github.jnuutinen.cookbook.presentation.about.AboutActivity;
 import com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity;
 import com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity;
 import com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity;
@@ -148,6 +149,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_categories:
                 startActivityForResult(new Intent(this, CategoriesActivity.class),
                         REQUEST_CATEGORIES);
+                break;
+            case R.id.action_about:
+                startActivity(new Intent(this, AboutActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);

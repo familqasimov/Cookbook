@@ -6,20 +6,26 @@
         android:id="@+id/action_search"
         android:title="@string/search_hint"
         android:icon="@drawable/ic_action_search"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"
+        android:orderInCategory="0"/>
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="90"
         android:title="@string/action_settings"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_sort"
-        android:orderInCategory="0"
+        android:orderInCategory="10"
         android:title="@string/action_sort"
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_categories"
         android:orderInCategory="50"
         android:title="@string/action_categories"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="100"
+        android:title="@string/action_about"
         app:showAsAction="never"/>
 </menu>

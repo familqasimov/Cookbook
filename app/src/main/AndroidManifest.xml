@@ -10,12 +10,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/TestTheme1"
+        android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <activity
             android:name=".presentation.main.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/TestTheme1.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,7 +26,7 @@
             android:name=".presentation.createrecipe.CreateRecipeActivity"
             android:label="@string/title_activity_create_recipe"
             android:parentActivityName=".presentation.main.MainActivity"
-            android:theme="@style/TestTheme1.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
@@ -35,7 +35,7 @@
             android:name=".presentation.viewrecipe.ViewRecipeActivity"
             android:label="@string/title_activity_view_recipe"
             android:parentActivityName=".presentation.main.MainActivity"
-            android:theme="@style/TestTheme1.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
@@ -44,7 +44,7 @@
             android:name=".presentation.editrecipe.EditRecipeActivity"
             android:label="@string/title_activity_edit_recipe"
             android:parentActivityName=".presentation.viewrecipe.ViewRecipeActivity"
-            android:theme="@style/TestTheme1.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity" />
@@ -53,7 +53,7 @@
             android:name=".presentation.categories.CategoriesActivity"
             android:label="@string/title_activity_edit_categories"
             android:parentActivityName=".presentation.main.MainActivity"
-            android:theme="@style/TestTheme1.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
@@ -62,7 +62,7 @@
             android:name=".presentation.about.AboutActivity"
             android:label="@string/title_activity_about"
             android:parentActivityName=".presentation.main.MainActivity"
-            android:theme="@style/TestTheme1.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />

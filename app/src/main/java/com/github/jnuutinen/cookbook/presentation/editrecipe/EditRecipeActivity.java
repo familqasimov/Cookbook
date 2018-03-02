@@ -28,6 +28,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity.STATE_INGREDIENTS;
+import static com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity.STATE_INSTRUCTIONS;
+import static com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity.STATE_NAME;
+
 public class EditRecipeActivity extends AppCompatActivity {
 //private static final String TAG = EditRecipeActivity.class.getSimpleName();
 
@@ -67,7 +71,14 @@ public class EditRecipeActivity extends AppCompatActivity {
             }
         });
         setTitle(recipe.getName());
-        populate();
+        if (savedInstanceState != null) {
+            name = savedInstanceState.getString(STATE_NAME);
+            ingredients = savedInstanceState.getStringArrayList(STATE_INGREDIENTS);
+            instructions = savedInstanceState.getString(STATE_INSTRUCTIONS);
+            populate(true);
+        } else {
+            populate(false);
+        }
     }
 
     @Override
@@ -75,6 +86,16 @@ public class EditRecipeActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_create_recipe, menu);
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        getRecipeInfo();
+        savedInstanceState.putString(STATE_NAME, name);
+        // TODO: persist category selection
+        savedInstanceState.putStringArrayList(STATE_INGREDIENTS, ingredients);
+        savedInstanceState.putString(STATE_INSTRUCTIONS, instructions);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -140,20 +161,28 @@ public class EditRecipeActivity extends AppCompatActivity {
         table.addView(row);
     }
 
-    private void populate() {
-        editTextName.setText(recipe.getName());
-        editTextInstructions.setText(recipe.getInstructions());
-        categoryId = recipe.getCategoryId();
-        if (categoryId == null) {
-            categoryCheckBox.setChecked(false);
-            spinnerCategory.setVisibility(View.GONE);
+    private void populate(boolean fromState) {
+        int ingredientsSize;
+        if (fromState) {
+            editTextName.setText(name);
+            editTextInstructions.setText(instructions);
+            ingredientsSize = ingredients.size();
         } else {
-            categoryCheckBox.setChecked(true);
-            spinnerCategory.setVisibility(View.VISIBLE);
+            ingredientsSize = recipe.getIngredients().size();
+            editTextName.setText(recipe.getName());
+            editTextInstructions.setText(recipe.getInstructions());
+            categoryId = recipe.getCategoryId();
+            if (categoryId == null) {
+                categoryCheckBox.setChecked(false);
+                spinnerCategory.setVisibility(View.GONE);
+            } else {
+                categoryCheckBox.setChecked(true);
+                spinnerCategory.setVisibility(View.VISIBLE);
+            }
         }
 
         // Ingredient rows
-        for (int i = 0; i < recipe.getIngredients().size(); i++) {
+        for (int i = 0; i < ingredientsSize; i++) {
             TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
             lp.setMargins(16, 16, 16, 16);
             TableRow row = new TableRow(this);
@@ -163,7 +192,11 @@ public class EditRecipeActivity extends AppCompatActivity {
             ingredient.setLayoutParams(lp);
             ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
             ingredient.setMaxLines(2);
-            ingredient.setText(recipe.getIngredients().get(i));
+            if (fromState) {
+                ingredient.setText(ingredients.get(i));
+            } else {
+                ingredient.setText(recipe.getIngredients().get(i));
+            }
             row.addView(ingredient);
             table.addView(row);
         }

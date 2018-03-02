@@ -30,6 +30,9 @@ import butterknife.ButterKnife;
 // TODO: cache unsaved recipe?
 public class CreateRecipeActivity extends AppCompatActivity {
     //private static final String TAG = CreateRecipeActivity.class.getSimpleName();
+    public static final String STATE_NAME = "name";
+    public static final String STATE_INGREDIENTS = "ingredients";
+    public static final String STATE_INSTRUCTIONS = "instructions";
 
     @BindView(R.id.table_ingredients) TableLayout table;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -61,7 +64,15 @@ public class CreateRecipeActivity extends AppCompatActivity {
                 spinnerCategory.setVisibility(View.GONE);
             }
         });
-        newRow(false);
+
+        if (savedInstanceState != null) {
+            name = savedInstanceState.getString(STATE_NAME);
+            ingredients = savedInstanceState.getStringArrayList(STATE_INGREDIENTS);
+            instructions = savedInstanceState.getString(STATE_INSTRUCTIONS);
+            populate();
+        } else {
+            newRow(false);
+        }
     }
 
     @Override
@@ -69,6 +80,16 @@ public class CreateRecipeActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_create_recipe, menu);
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        getRecipeInfo();
+        savedInstanceState.putString(STATE_NAME, name);
+        // TODO: persist category selection
+        savedInstanceState.putStringArrayList(STATE_INGREDIENTS, ingredients);
+        savedInstanceState.putString(STATE_INSTRUCTIONS, instructions);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -125,6 +146,29 @@ public class CreateRecipeActivity extends AppCompatActivity {
             ingredient.requestFocus();
         }
         table.addView(row);
+    }
+
+    private void populate() {
+        editTextName.setText(name);
+        editTextInstructions.setText(instructions);
+
+        // Ingredient rows
+        for (int i = 0; i < ingredients.size(); i++) {
+            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(16, 16, 16, 16);
+            TableRow row = new TableRow(this);
+            row.setLayoutParams(lp);
+            EditText ingredient = new EditText(this);
+            lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.2f);
+            ingredient.setLayoutParams(lp);
+            ingredient.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
+            ingredient.setMaxLines(2);
+            ingredient.setText(ingredients.get(i));
+            row.addView(ingredient);
+            table.addView(row);
+        }
+        // If there are no ingredients, create one empty row.
+        if (table.getChildCount() == 0) newRow(new View(this));
     }
 
     private void populateCategoriesSpinner() {

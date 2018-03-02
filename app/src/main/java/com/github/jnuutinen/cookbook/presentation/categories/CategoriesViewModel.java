@@ -26,6 +26,10 @@ public class CategoriesViewModel extends AndroidViewModel {
         return observableCategories;
     }
 
+    void deleteCategory(Category category) {
+        dataRepository.deleteCategory(category);
+    }
+
     void insertCategory(Category category) {
         dataRepository.insertCategory(category);
     }

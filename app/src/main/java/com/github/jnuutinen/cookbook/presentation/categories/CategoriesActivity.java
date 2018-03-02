@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,7 +20,6 @@ import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
-import com.github.jnuutinen.cookbook.presentation.editcategory.EditCategoryActivity;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,6 +31,7 @@ import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 public class CategoriesActivity extends AppCompatActivity {
+    private static final String TAG = CategoriesActivity.class.getSimpleName();
     private static final int REQUEST_EDIT_CATEGORY = 1;
 
     @BindView(R.id.text_no_categories) TextView noCategoriesText;
@@ -38,8 +39,12 @@ public class CategoriesActivity extends AppCompatActivity {
     @BindView(R.id.list_categories) ListView categoriesList;
 
     private AlertDialog addCategoryDialog;
+    private AlertDialog deleteDialog;
+    private AlertDialog editCategoryDialog;
     private CategoriesViewModel viewModel;
     private List<Category> liveCategories;
+    private Category editedCategory;
+    private View dialogView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,8 @@ public class CategoriesActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         registerForContextMenu(categoriesList);
         buildCreateCategoryDialog();
+        buildDeleteCategoryDialog();
+        buildEditCategoryDialog();
         observe();
     }
 
@@ -89,9 +96,16 @@ public class CategoriesActivity extends AppCompatActivity {
                 item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.action_edit_category:
-                Intent intent = new Intent(this, EditCategoryActivity.class);
-                intent.putExtra("category", liveCategories.get(info.position));
-                startActivityForResult(intent, REQUEST_EDIT_CATEGORY);
+                editedCategory = liveCategories.get(info.position);
+                editCategoryDialog.setTitle("Editing category '" + editedCategory.getName() + "'");
+                editCategoryDialog.show();
+                ((EditText) dialogView.findViewById(R.id.edit_category_name)).setText(editedCategory
+                        .getName());
+                return true;
+            case R.id.action_delete_category:
+                editedCategory = liveCategories.get(info.position);
+                deleteDialog.setTitle("Delete category '" + editedCategory.getName() + "'?");
+                deleteDialog.show();
                 return true;
             default:
                 return super.onContextItemSelected(item);
@@ -100,6 +114,8 @@ public class CategoriesActivity extends AppCompatActivity {
 
     @OnClick(R.id.button_add_category)
     void addCategory() {
+        editCategoryDialog.dismiss();
+        deleteDialog.dismiss();
         addCategoryDialog.show();
     }
 
@@ -108,17 +124,19 @@ public class CategoriesActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.putExtra("filter", "category: " + liveCategories.get(position).getName());
         setResult(RESULT_OK, intent);
+        Log.d(TAG, "result set to RESULT_OK, filter set to 'category: "
+                + liveCategories.get(position).getName());
         finish();
     }
 
+    @SuppressLint("InflateParams")
     private void buildCreateCategoryDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        @SuppressLint("InflateParams") View dialogView = getLayoutInflater()
-                .inflate(R.layout.dialog_create_category, null);
-        addCategoryDialog = builder.setView(dialogView)
-                .setMessage(R.string.title_create_category)
+        View createDialogView = getLayoutInflater().inflate(R.layout.dialog_create_category, null);
+        addCategoryDialog = builder.setView(createDialogView)
+                .setTitle(R.string.title_create_category)
                 .setPositiveButton(R.string.action_save, (dialog, which) -> {
-                    String categoryName = ((EditText) dialogView
+                    String categoryName = ((EditText) createDialogView
                             .findViewById(R.id.edit_category_name)).getText().toString().trim();
                     if (categoryName.length() == 0) {
                         Snackbar.make(categoriesList, R.string.alert_blank_category_name,
@@ -136,6 +154,54 @@ public class CategoriesActivity extends AppCompatActivity {
                         }
                         if (!duplicateFound) {
                             viewModel.insertCategory(new Category(categoryName));
+                            Snackbar.make(categoriesList, R.string.alert_category_saved,
+                                    Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+                    ((EditText) createDialogView.findViewById(R.id.edit_category_name)).setText("");
+                }).setNegativeButton(R.string.cancel, (dialog, which) -> {
+                    // Canceled, do nothing
+                }).create();
+    }
+
+    private void buildDeleteCategoryDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.alert_delete_category)
+                .setPositiveButton(R.string.yes, (dialog, which) ->
+                        viewModel.deleteCategory(editedCategory))
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
+                   // Do nothing
+                });
+        deleteDialog = builder.create();
+
+    }
+
+    @SuppressLint("InflateParams")
+    private void buildEditCategoryDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_category, null);
+        editCategoryDialog = builder.setView(dialogView)
+                .setPositiveButton(R.string.action_save, (dialog, which) -> {
+                    String categoryName = ((EditText) dialogView
+                            .findViewById(R.id.edit_category_name)).getText().toString().trim();
+                    if (categoryName.length() == 0) {
+                        Snackbar.make(categoriesList, R.string.alert_blank_category_name,
+                                Snackbar.LENGTH_LONG).show();
+                    } else {
+                        // Check for duplicate category
+                        boolean duplicateFound = false;
+                        for (Category c : liveCategories) {
+                            if (c.getName().toLowerCase().equals(categoryName.toLowerCase())
+                                    && c != editedCategory) {
+                                duplicateFound = true;
+                                Snackbar.make(categoriesList, R.string.category_name_duplicate,
+                                        Snackbar.LENGTH_LONG).show();
+                                break;
+                            }
+                        }
+                        if (!duplicateFound) {
+                            editedCategory.setName(categoryName);
+                            viewModel.updateCategory(editedCategory);
                             Snackbar.make(categoriesList, R.string.alert_category_saved,
                                     Snackbar.LENGTH_LONG).show();
                         }

@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ADD_RECIPE = 1;
     private static final int REQUEST_VIEW_RECIPE = 2;
-    private static final int REQUEST_CATEGORIES = 3;
+    public static final int REQUEST_CATEGORIES = 3;
     private static final int SORT_NAME = 0;
     private static final int SORT_CATEGORY = 1;
     private static final String STATE_SEARCH = "search";
@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "filterExtra == null");
                     }
                 }
+                break;
         }
     }
 

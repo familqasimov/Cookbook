@@ -88,22 +88,44 @@ class RecipeAdapter extends ArrayAdapter<CombineDao.combinedRecipe> implements F
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             String filterString = constraint.toString().toLowerCase();
+            String[] splitted = filterString.split(" ");
             FilterResults results = new FilterResults();
             final List<CombineDao.combinedRecipe> original = combinedRecipes;
             int count = original.size();
             final ArrayList<CombineDao.combinedRecipe> newList =
                     new ArrayList<>(count);
             String filterableString;
-            for (int i = 0; i < count; i++) {
-                filterableString = original.get(i).recipeName;
-                if (filterableString.toLowerCase().contains(filterString)) {
-                    newList.add(original.get(i));
+            if (splitted[0].equals("category:") && splitted.length > 1) {
+                StringBuilder builder = new StringBuilder();
+                for (int i = 1; i < splitted.length; i++) {
+                    builder.append(splitted[i]);
+                    if (i < splitted.length - 1) {
+                        builder.append(" ");
+                    }
                 }
-                filterableString = original.get(i).categoryName;
-                if (filterableString != null) {
+                filterString = builder.toString();
+                for (int i = 0; i < count; i++) {
+                    filterableString = original.get(i).categoryName;
+                    if (filterableString != null) {
+                        if (filterableString.toLowerCase().equals(filterString)) {
+                            if (!newList.contains(original.get(i))) {
+                                newList.add(original.get(i));
+                            }
+                        }
+                    }
+                }
+            } else {
+                for (int i = 0; i < count; i++) {
+                    filterableString = original.get(i).recipeName;
                     if (filterableString.toLowerCase().contains(filterString)) {
-                        if (!newList.contains(original.get(i))) {
-                            newList.add(original.get(i));
+                        newList.add(original.get(i));
+                    }
+                    filterableString = original.get(i).categoryName;
+                    if (filterableString != null) {
+                        if (filterableString.toLowerCase().contains(filterString)) {
+                            if (!newList.contains(original.get(i))) {
+                                newList.add(original.get(i));
+                            }
                         }
                     }
                 }

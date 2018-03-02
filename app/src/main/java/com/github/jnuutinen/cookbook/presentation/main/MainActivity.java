@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,13 +34,16 @@ import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class MainActivity extends AppCompatActivity {
-    //private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ADD_RECIPE = 1;
     private static final int REQUEST_VIEW_RECIPE = 2;
+    private static final int REQUEST_CATEGORIES = 3;
     private static final int SORT_NAME = 0;
     private static final int SORT_CATEGORY = 1;
+    private static final String STATE_SEARCH = "search";
     private static int sort = SORT_NAME;
 
     @BindView(R.id.edit_search_recipe) EditText searchEditText;
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.text_sort) TextView sortText;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
+    private String search;
     private List<CombineDao.combinedRecipe> liveCombinedRecipes;
     private List<Recipe> liveRecipes;
     private RecipeAdapter adapter;
@@ -61,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         createSortDialog();
-        noRecipesText.setVisibility(View.VISIBLE);
-        sortText.setVisibility(GONE);
         observe();
 
         searchEditText.setOnFocusChangeListener((v, hasFocus) -> {
@@ -75,12 +78,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         makeSearchListener();
+
+        if (savedInstanceState != null) {
+            search = savedInstanceState.getString(STATE_SEARCH);
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        if (searchEditText.getVisibility() == VISIBLE) {
+            savedInstanceState.putString(STATE_SEARCH, searchEditText.getText().toString());
+        }
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -99,6 +114,21 @@ public class MainActivity extends AppCompatActivity {
                             .show();
                 }
                 break;
+            case REQUEST_CATEGORIES:
+                if (resultCode == RESULT_OK) {
+                    Log.d(TAG, "REQUEST_CATEGORIES result: RESULT_OK");
+                    String filterExtra = data.getStringExtra("filter");
+                    if (filterExtra != null) {
+                        Log.d(TAG, "filter: " + filterExtra);
+                        if (searchEditText.getVisibility() == VISIBLE) {
+                            searchEditText.setText(filterExtra);
+                        } else {
+                            toggleSearch(filterExtra);
+                        }
+                    } else {
+                        Log.d(TAG, "filterExtra == null");
+                    }
+                }
         }
     }
 
@@ -115,7 +145,8 @@ public class MainActivity extends AppCompatActivity {
                 sortDialog.show();
                 break;
             case R.id.action_categories:
-                startActivity(new Intent(this, CategoriesActivity.class));
+                startActivityForResult(new Intent(this, CategoriesActivity.class),
+                        REQUEST_CATEGORIES);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -191,11 +222,25 @@ public class MainActivity extends AppCompatActivity {
                 if (combinedRecipes.size() > 0) {
                     noRecipesText.setVisibility(GONE);
                     sortText.setVisibility(View.VISIBLE);
+                } else {
+                    noRecipesText.setVisibility(View.VISIBLE);
+                    sortText.setVisibility(GONE);
                 }
+            } else {
+                noRecipesText.setVisibility(View.VISIBLE);
+                sortText.setVisibility(GONE);
             }
             liveCombinedRecipes = sortRecipes(combinedRecipes);
             adapter = new RecipeAdapter(this, combinedRecipes);
             recipeList.setAdapter(adapter);
+            if (searchEditText.getVisibility() == VISIBLE) {
+                adapter.getFilter().filter(searchEditText.getText().toString());
+            } else if (search != null) {
+                searchEditText.setVisibility(VISIBLE);
+                searchEditText.setText(search);
+                adapter.getFilter().filter(search);
+                search = null;
+            }
         });
     }
 
@@ -206,6 +251,17 @@ public class MainActivity extends AppCompatActivity {
         } else {
             searchEditText.setVisibility(View.VISIBLE);
             searchEditText.requestFocus();
+        }
+    }
+
+    private void toggleSearch(String searchString) {
+        if (searchEditText.getVisibility() == View.VISIBLE) {
+            searchEditText.setText("");
+            searchEditText.setVisibility(View.GONE);
+        } else {
+            searchEditText.setVisibility(View.VISIBLE);
+            searchEditText.requestFocus();
+            searchEditText.setText(searchString);
         }
     }
 

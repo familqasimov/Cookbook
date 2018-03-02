@@ -8,7 +8,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -46,9 +50,17 @@ public class CategoriesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        noCategoriesText.setVisibility(View.VISIBLE);
+        registerForContextMenu(categoriesList);
         buildCreateCategoryDialog();
         observe();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        //menu.setHeaderTitle("title here");
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.context_menu_categories, menu);
     }
 
     @Override
@@ -71,16 +83,32 @@ public class CategoriesActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)
+                item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.action_edit_category:
+                Intent intent = new Intent(this, EditCategoryActivity.class);
+                intent.putExtra("category", liveCategories.get(info.position));
+                startActivityForResult(intent, REQUEST_EDIT_CATEGORY);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
     @OnClick(R.id.button_add_category)
     void addCategory() {
         addCategoryDialog.show();
     }
 
     @OnItemClick(R.id.list_categories)
-    void editCategory(int position) {
-        Intent intent = new Intent(this, EditCategoryActivity.class);
-        intent.putExtra("category", liveCategories.get(position));
-        startActivityForResult(intent, REQUEST_EDIT_CATEGORY);
+    void showCategoryRecipes(int position) {
+        Intent intent = new Intent();
+        intent.putExtra("filter", "category: " + liveCategories.get(position).getName());
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     private void buildCreateCategoryDialog() {
@@ -124,7 +152,11 @@ public class CategoriesActivity extends AppCompatActivity {
             if (categories != null) {
                 if (categories.size() != 0) {
                     noCategoriesText.setVisibility(View.GONE);
+                } else {
+                    noCategoriesText.setVisibility(View.VISIBLE);
                 }
+            } else {
+                noCategoriesText.setVisibility(View.VISIBLE);
             }
             liveCategories = sortCategories(categories);
             categoriesList.setAdapter(new CategoryAdapter(this, liveCategories));

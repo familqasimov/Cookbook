@@ -1,7 +1,4 @@
-# Cookbook
-A simple Android cookbook app.
-
-Screengrabs:
+# Screengrabs:
 
 ![cookbook](images/grabs3.png)
 

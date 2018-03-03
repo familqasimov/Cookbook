@@ -101,6 +101,10 @@ public class ViewRecipeActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, EditRecipeActivity.class);
                 intent.putExtra("recipe", recipe);
                 startActivityForResult(intent, REQUEST_EDIT_RECIPE);
+                return true;
+            case R.id.action_share:
+                shareRecipe();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -145,5 +149,31 @@ public class ViewRecipeActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void shareRecipe() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(recipe.getName());
+        builder.append("\n");
+        builder.append("\n");
+        if (recipe.getCategoryId() != null) {
+            builder.append(category.getText().toString());
+            builder.append("\n");
+            builder.append("\n");
+        }
+        builder.append(ingredients.getText().toString());
+        builder.append("\n");
+        builder.append("\n");
+        builder.append(instructions.getText().toString());
+        String shareableRecipe = builder.toString();
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_TEXT, shareableRecipe);
+        intent.setType("text/plain");
+        String title = getResources().getString(R.string.action_share);
+        Intent chooser = Intent.createChooser(intent, title);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(chooser);
+        }
     }
 }

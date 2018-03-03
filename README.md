@@ -3,7 +3,7 @@ A simple Android cookbook app.
 
 Screengrabs:
 
-![cookbook](https://github.com/JNuutinen/Cookbook/blob/master/images/grabs3.png)
+![cookbook](images/grabs3.png)
 
 # License
 

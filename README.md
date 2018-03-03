@@ -1,4 +1,14 @@
-## Screengrabs:
+## Features
+* Create & edit recipes
+* Optionally assign categories to recipes
+* Create & edit categories
+* Sort recipes alphabetically by recipe name or category
+* Search created recipes
+* Filter recipes by a specific category
+* Uses Room persistence library to save recipes & categories to a local database
+* Doesn't require any permissions
+
+## Screengrabs
 
 ![cookbook](images/grabs3.png)
 

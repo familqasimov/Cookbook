@@ -12,6 +12,23 @@
 
 ![cookbook](images/grabs3.png)
 
+## Credits
+* Android Architecture Components
+  * [Lifecycles](https://developer.android.com/topic/libraries/architecture/lifecycle.html)
+  * [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html)
+  * [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel.html)
+  * [Room](https://developer.android.com/topic/libraries/architecture/room.html)
+* Android Support Libraries
+  * [AppCompat v7](https://developer.android.com/topic/libraries/support-library/packages.html#v7-appcompat)
+  * [ConstraintLayout](https://developer.android.com/reference/android/support/constraint/ConstraintLayout.html)
+  * [Design](https://developer.android.com/topic/libraries/support-library/features.html#material-design)
+  * [Support v4](https://developer.android.com/topic/libraries/support-library/packages.html#v4)
+  * [Testing Support Library](https://developer.android.com/topic/libraries/testing-support-library/index.html)
+* [Butter Knife](https://github.com/JakeWharton/butterknife)
+* [DroidParts ClearableEditText](https://github.com/droidparts/droidparts/blob/master/droidparts-misc/src/org/droidparts/widget/ClearableEditText.java)
+* [Google Open Source Notices Gradle Plugin](https://developers.google.com/android/guides/opensource)
+
+
 ## License
 
     Copyright 2018 Juha Nuutinen

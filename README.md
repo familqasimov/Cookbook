@@ -13,6 +13,7 @@
 ![cookbook](images/grabs3.png)
 
 ## Credits
+* [Android Asset Studio](https://github.com/romannurik/AndroidAssetStudio) - Roman Nurik
 * Android Architecture Components
   * [Lifecycles](https://developer.android.com/topic/libraries/architecture/lifecycle.html)
   * [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html)

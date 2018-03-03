@@ -24,9 +24,9 @@
   * [Design](https://developer.android.com/topic/libraries/support-library/features.html#material-design)
   * [Support v4](https://developer.android.com/topic/libraries/support-library/packages.html#v4)
   * [Testing Support Library](https://developer.android.com/topic/libraries/testing-support-library/index.html)
-* [Butter Knife](https://github.com/JakeWharton/butterknife)
-* [DroidParts ClearableEditText](https://github.com/droidparts/droidparts/blob/master/droidparts-misc/src/org/droidparts/widget/ClearableEditText.java)
-* [Google Open Source Notices Gradle Plugin](https://developers.google.com/android/guides/opensource)
+* [Butter Knife](https://github.com/JakeWharton/butterknife) - Jake Wharton
+* [DroidParts ClearableEditText](https://github.com/droidparts/droidparts/blob/master/droidparts-misc/src/org/droidparts/widget/ClearableEditText.java) - Alex Yanchenko
+* [Google Open Source Notices Gradle Plugin](https://developers.google.com/android/guides/opensource) - Google
 
 
 ## License

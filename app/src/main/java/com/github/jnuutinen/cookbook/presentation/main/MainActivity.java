@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +14,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,7 +26,6 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.about.AboutActivity;
 import com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity;
 import com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity;
-import com.github.jnuutinen.cookbook.presentation.settings.SettingsActivity;
 import com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity;
 
 import java.util.Collections;
@@ -142,9 +144,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_search:
                 toggleSearch();
                 break;
-            case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
             case R.id.action_sort:
                 sortDialog.show();
                 break;
@@ -182,6 +181,60 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_VIEW_RECIPE);
             }
         }
+    }
+
+    public static void expand(final View v) {
+        v.measure(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        final int targetHeight = v.getMeasuredHeight();
+
+        // Older versions of android (pre API 21) cancel animations for views with a height of 0.
+        v.getLayoutParams().height = 1;
+        v.setVisibility(View.VISIBLE);
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                v.getLayoutParams().height = interpolatedTime == 1
+                        ? ConstraintLayout.LayoutParams.WRAP_CONTENT
+                        : (int)(targetHeight * interpolatedTime);
+                v.requestLayout();
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int)(targetHeight / v.getContext().getResources().getDisplayMetrics().density) + 1000);
+        v.startAnimation(a);
+    }
+
+    public static void collapse(final View v) {
+        final int initialHeight = v.getMeasuredHeight();
+
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                if(interpolatedTime == 1){
+                    v.setVisibility(View.GONE);
+                }else{
+                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                    v.requestLayout();
+                }
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density) * 10);
+        v.startAnimation(a);
     }
 
     private void createSortDialog() {
@@ -255,7 +308,9 @@ public class MainActivity extends AppCompatActivity {
         if (searchEditText.getVisibility() == View.VISIBLE) {
             searchEditText.setText("");
             searchEditText.setVisibility(View.GONE);
+            //collapse(searchEditText);
         } else {
+            //expand(searchEditText);
             searchEditText.setVisibility(View.VISIBLE);
             searchEditText.requestFocus();
         }

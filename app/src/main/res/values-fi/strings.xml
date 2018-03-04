@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Cookbook</string>
     <string name="action_settings">Asetukset</string>
     <string name="contentdesc_delete_category">Poista kategoria</string>
     <string name="contentdesc_edit_category">Muokkaa kategoriaa</string>
@@ -8,7 +7,6 @@
     <string name="recipe_name_hint">Reseptin nimi</string>
     <string name="recipe_category">Kategoria</string>
     <string name="recipe_ingredients">Ainekset</string>
-    <string name="recipe_blank">Tyhjät ainesrivit jätetään huomiotta</string>
     <string name="contentdesc_add_ingredient">Lisää aines -painike</string>
     <string name="contentdesc_remove_ingredient">Poista aines -painike</string>
     <string name="recipe_instructions">Ohjeet</string>
@@ -49,15 +47,9 @@
     <string name="title_activity_about">Tietoja</string>
     <string name="action_license">Avoimen lähdekoodin lisenssit</string>
     <string name="text_about_app">Simppeli avoimen lähdekoodin keittokirja-aplikaatio.</string>
-    <string name="text_about_url">https://github.com/JNuutinen/Cookbook</string>
     <string name="action_about">Tietoja</string>
     <string name="action_cookbook_license">Lisenssi</string>
     <string name="action_share">Jaa resepti</string>
-    <string name="pref_title_language">Kieli</string>
-    <string name="pref_language_default">Vakio</string>
-    <string name="pref_language_finnish">Suomi</string>
-    <string name="pref_language_english">Englanti</string>
-    <string name="pref_header_general">Yleiset</string>
     <string name="title_editing_category">Muokataan kategoriaa \'%1$s\'</string>
     <string name="title_deleting_category">Poista kategoria \'%1$s\'?</string>
 </resources>

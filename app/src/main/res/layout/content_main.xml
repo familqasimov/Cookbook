@@ -7,7 +7,8 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.github.jnuutinen.cookbook.presentation.main.MainActivity"
-    tools:showIn="@layout/activity_main">
+    tools:showIn="@layout/activity_main"
+    android:animateLayoutChanges="true">
 
     <org.droidparts.widget.ClearableEditText
         android:drawableRight="@drawable/ic_action_clear"

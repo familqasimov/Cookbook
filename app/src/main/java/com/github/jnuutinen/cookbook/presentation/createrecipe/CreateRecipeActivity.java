@@ -109,7 +109,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
     public void removeRow(View view) {
         int numberOfRows = table.getChildCount();
-        if (numberOfRows > 1) table.removeViewAt(numberOfRows - 1);
+        if (numberOfRows > 1) {
+            table.removeViewAt(numberOfRows - 1);
+        }
     }
 
     private void getRecipeInfo() {

@@ -53,4 +53,11 @@
     <string name="action_about">Tietoja</string>
     <string name="action_cookbook_license">Lisenssi</string>
     <string name="action_share">Jaa resepti</string>
+    <string name="pref_title_language">Kieli</string>
+    <string name="pref_language_default">Vakio</string>
+    <string name="pref_language_finnish">Suomi</string>
+    <string name="pref_language_english">Englanti</string>
+    <string name="pref_header_general">Yleiset</string>
+    <string name="title_editing_category">Muokataan kategoriaa \'%1$s\'</string>
+    <string name="title_deleting_category">Poista kategoria \'%1$s\'?</string>
 </resources>

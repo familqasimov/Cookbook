@@ -23,6 +23,7 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.about.AboutActivity;
 import com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity;
 import com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.settings.SettingsActivity;
 import com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity;
 
 import java.util.Collections;
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 toggleSearch();
                 break;
             case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.action_sort:
                 sortDialog.show();

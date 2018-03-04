@@ -4,4 +4,16 @@
         <item>@string/recipe_name_hint</item>
         <item>@string/recipe_category</item>
     </string-array>
+
+    <string-array name="pref_list_languages_titles">
+        <item>@string/pref_language_default</item>
+        <item>@string/pref_language_english</item>
+        <item>@string/pref_language_finnish</item>
+    </string-array>
+
+    <string-array name="pref_list_languages_values">
+        <item>"default"</item>
+        <item>en</item>
+        <item>fi</item>
+    </string-array>
 </resources>

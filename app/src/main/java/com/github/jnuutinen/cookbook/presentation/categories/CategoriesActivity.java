@@ -8,7 +8,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,7 +30,7 @@ import butterknife.OnClick;
 import butterknife.OnItemClick;
 
 public class CategoriesActivity extends AppCompatActivity {
-    private static final String TAG = CategoriesActivity.class.getSimpleName();
+    //private static final String TAG = CategoriesActivity.class.getSimpleName();
     private static final int REQUEST_EDIT_CATEGORY = 1;
 
     @BindView(R.id.text_no_categories) TextView noCategoriesText;
@@ -97,14 +96,16 @@ public class CategoriesActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_edit_category:
                 editedCategory = liveCategories.get(info.position);
-                editCategoryDialog.setTitle("Editing category '" + editedCategory.getName() + "'");
+                editCategoryDialog.setTitle(getString(R.string.title_editing_category,
+                        editedCategory.getName()));
                 editCategoryDialog.show();
                 ((EditText) dialogView.findViewById(R.id.edit_category_name)).setText(editedCategory
                         .getName());
                 return true;
             case R.id.action_delete_category:
                 editedCategory = liveCategories.get(info.position);
-                deleteDialog.setTitle("Delete category '" + editedCategory.getName() + "'?");
+                deleteDialog.setTitle(getString(R.string.title_deleting_category,
+                        editedCategory.getName()));
                 deleteDialog.show();
                 return true;
             default:
@@ -124,8 +125,6 @@ public class CategoriesActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.putExtra("filter", "category: " + liveCategories.get(position).getName());
         setResult(RESULT_OK, intent);
-        Log.d(TAG, "result set to RESULT_OK, filter set to 'category: "
-                + liveCategories.get(position).getName());
         finish();
     }
 

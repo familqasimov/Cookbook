@@ -134,7 +134,11 @@ public class EditRecipeActivity extends AppCompatActivity {
     private void getRecipeInfo() {
         name = editTextName.getText().toString().trim();
         ingredients = new ArrayList<>();
-        categoryId = ((Category) spinnerCategory.getSelectedItem()).getId();
+        if (categoryCheckBox.isChecked()) {
+            categoryId = ((Category) spinnerCategory.getSelectedItem()).getId();
+        } else {
+            categoryId = null;
+        }
         instructions = editTextInstructions.getText().toString().trim();
         for (int i = 0; i < table.getChildCount(); i++) {
             View view = table.getChildAt(i);

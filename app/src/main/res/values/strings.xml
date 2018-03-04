@@ -104,4 +104,9 @@
 
     <string name="title_editing_category">Editing category \'%1$s\'</string>
     <string name="title_deleting_category">Delete category \'%1$s\'?</string>
+    <string name="title_version_number">Version %1$s</string>
+    <string name="title_introduction_example_recipes">Example recipes</string>
+    <string name="title_introduction_example_categories">Example categories</string>
+    <string name="option_introduction_recipes">Generate example recipes</string>
+    <string name="option_introduction_categories">Generate example categories</string>
 </resources>

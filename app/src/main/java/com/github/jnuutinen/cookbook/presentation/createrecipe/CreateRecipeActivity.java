@@ -134,10 +134,13 @@ public class CreateRecipeActivity extends AppCompatActivity {
     }
 
     private void newRow(boolean tapped) {
+        // Table row
         TableRow row = new TableRow(this);
         TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
         lp.setMargins(16, 16, 16, 16);
         row.setLayoutParams(lp);
+
+        // Ingredient EditText
         EditText ingredient = new EditText(this);
         lp = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.6f);
         ingredient.setLayoutParams(lp);

@@ -28,6 +28,7 @@
 * [Butter Knife](https://github.com/JakeWharton/butterknife) - Jake Wharton
 * [DroidParts ClearableEditText](https://github.com/droidparts/droidparts/blob/master/droidparts-misc/src/org/droidparts/widget/ClearableEditText.java) - Alex Yanchenko
 * [Google Open Source Notices Gradle Plugin](https://developers.google.com/android/guides/opensource) - Google
+* [Introduction](https://github.com/RubenGees/Introduction) - Ruben Gees
 
 
 ## License

@@ -54,6 +54,14 @@ public class DataRepository {
         return instance;
     }
 
+    public void deleteAllCategories() {
+        instance.appDatabase.deleteAllCategories();
+    }
+
+    public void deleteAllRecipes() {
+        instance.appDatabase.deleteAllRecipes();
+    }
+
     public void deleteCategory(Category category) {
         instance.appDatabase.deleteCategory(category);
     }

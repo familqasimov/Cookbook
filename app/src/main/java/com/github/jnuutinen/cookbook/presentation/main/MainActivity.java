@@ -3,8 +3,8 @@ package com.github.jnuutinen.cookbook.presentation.main;
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,12 +14,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.github.jnuutinen.cookbook.BuildConfig;
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
@@ -27,7 +26,12 @@ import com.github.jnuutinen.cookbook.presentation.about.AboutActivity;
 import com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity;
 import com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity;
 import com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity;
+import com.rubengees.introduction.IntroductionActivity;
+import com.rubengees.introduction.IntroductionBuilder;
+import com.rubengees.introduction.Option;
+import com.rubengees.introduction.Slide;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int SORT_NAME = 0;
     private static final int SORT_CATEGORY = 1;
     private static final String STATE_SEARCH = "search";
+
     private static int sort = SORT_NAME;
 
     @BindView(R.id.edit_search_recipe) EditText searchEditText;
@@ -56,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.text_sort) TextView sortText;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
+    private MainViewModel viewModel;
     private String search;
     private List<CombineDao.combinedRecipe> liveCombinedRecipes;
     private List<Recipe> liveRecipes;
@@ -65,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
@@ -86,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             search = savedInstanceState.getString(STATE_SEARCH);
         }
+
+        checkFirstRun();
     }
 
     @Override
@@ -132,6 +141,28 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Log.d(TAG, "filterExtra == null");
                     }
+                }
+                break;
+            case IntroductionBuilder.INTRODUCTION_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    for (Option option : data.<Option>getParcelableArrayListExtra(IntroductionActivity.
+                            OPTION_RESULT)) {
+                        if (option.getPosition() == 0) {
+                            if (!option.isActivated()) {
+                                // Delete example recipes
+                                viewModel.deleteAllRecipes();
+                            }
+                        } else if (option.getPosition() == 1) {
+                            if (!option.isActivated()) {
+                                // Delete example categories
+                                viewModel.deleteAllCategories();
+                            }
+                        }
+                    }
+                } else {
+                    // Introduction skipped
+                    viewModel.deleteAllRecipes();
+                    viewModel.deleteAllCategories();
                 }
                 break;
         }
@@ -183,58 +214,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void expand(final View v) {
-        v.measure(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
-        final int targetHeight = v.getMeasuredHeight();
+    private void checkFirstRun() {
+        final String PREFS_NAME = "com.github.jnuutinen.cookbook";
+        final String PREF_VERSION_CODE_KEY = "version_code";
+        final int DOESNT_EXIST = -1;
 
-        // Older versions of android (pre API 21) cancel animations for views with a height of 0.
-        v.getLayoutParams().height = 1;
-        v.setVisibility(View.VISIBLE);
-        Animation a = new Animation()
-        {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                v.getLayoutParams().height = interpolatedTime == 1
-                        ? ConstraintLayout.LayoutParams.WRAP_CONTENT
-                        : (int)(targetHeight * interpolatedTime);
-                v.requestLayout();
-            }
+        // Get current version code
+        int currentVersionCode = BuildConfig.VERSION_CODE;
 
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
+        // Get saved version code
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int savedVersionCode = prefs.getInt(PREF_VERSION_CODE_KEY, DOESNT_EXIST);
 
-        // 1dp/ms
-        a.setDuration((int)(targetHeight / v.getContext().getResources().getDisplayMetrics().density) + 1000);
-        v.startAnimation(a);
-    }
+        // Check for first run or upgrade
+        if (currentVersionCode == savedVersionCode) {
+            // Normal run
+            return;
+        } else if (savedVersionCode == DOESNT_EXIST) {
+            new IntroductionBuilder(this).withSlides(generateSlides()).introduceMyself();
+        } else if (currentVersionCode > savedVersionCode) {
+            // Upgrade
+        }
 
-    public static void collapse(final View v) {
-        final int initialHeight = v.getMeasuredHeight();
-
-        Animation a = new Animation()
-        {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if(interpolatedTime == 1){
-                    v.setVisibility(View.GONE);
-                }else{
-                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
-                    v.requestLayout();
-                }
-            }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-
-        // 1dp/ms
-        a.setDuration((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density) * 10);
-        v.startAnimation(a);
+        // Update the shared preferences with the current version code
+        prefs.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply();
     }
 
     private void createSortDialog() {
@@ -252,6 +255,24 @@ public class MainActivity extends AppCompatActivity {
                     observe();
                 });
         sortDialog = builder.create();
+    }
+
+    private List<Slide> generateSlides() {
+        List<Slide> result = new ArrayList<>();
+
+        result.add(new Slide()
+                .withTitle(R.string.title_introduction_example_recipes)
+                .withColorResource(R.color.colorPrimary)
+                .withOption(new Option(R.string.option_introduction_recipes, true))
+        );
+
+        result.add(new Slide()
+                .withTitle(R.string.title_introduction_example_categories)
+                .withColorResource(R.color.colorAccent)
+                .withOption(new Option(R.string.option_introduction_categories, true))
+        );
+
+        return result;
     }
 
     private void makeSearchListener() {
@@ -274,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void observe() {
-        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         viewModel.getRecipes().observe(this, recipes -> liveRecipes = recipes);
 
         viewModel.getCombinedRecipes().observe(this, combinedRecipes -> {

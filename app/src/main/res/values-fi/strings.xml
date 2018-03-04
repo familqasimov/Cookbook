@@ -52,4 +52,9 @@
     <string name="action_share">Jaa resepti</string>
     <string name="title_editing_category">Muokataan kategoriaa \'%1$s\'</string>
     <string name="title_deleting_category">Poista kategoria \'%1$s\'?</string>
+    <string name="title_version_number">Versio %1$s</string>
+    <string name="title_introduction_example_recipes">Esimerkkireseptit</string>
+    <string name="title_introduction_example_categories">Esimerkkikategoriat</string>
+    <string name="option_introduction_recipes">Generoi esimerkkireseptit</string>
+    <string name="option_introduction_categories">Generoi esimerkkikategoriat</string>
 </resources>

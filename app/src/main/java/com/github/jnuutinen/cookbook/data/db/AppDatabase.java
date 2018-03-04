@@ -96,6 +96,16 @@ public abstract class AppDatabase extends RoomDatabase {
         isDatabaseCreated.postValue(true);
     }
 
+    public void deleteAllCategories() {
+        executors.diskIo().execute(() -> instance.runInTransaction(() ->
+                instance.categoryDao().deleteAll()));
+    }
+
+    public void deleteAllRecipes() {
+        executors.diskIo().execute(() -> instance.runInTransaction(() ->
+                instance.recipeDao().deleteAll()));
+    }
+
     public void deleteCategory(final Category category) {
         executors.diskIo().execute(() -> instance.runInTransaction(() ->
                 instance.categoryDao().delete(category)));

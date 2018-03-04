@@ -2,6 +2,7 @@ package com.github.jnuutinen.cookbook.presentation.about;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +18,7 @@ import butterknife.OnClick;
 public class AboutActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.text_version_number) TextView versionnumber;
     @BindView(R.id.text_about_url) TextView gitHubLink;
 
     private AlertDialog licenseDialog;
@@ -31,6 +33,7 @@ public class AboutActivity extends AppCompatActivity {
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         buildLicenseDialog();
+        getVersionNumber();
     }
 
     @OnClick(R.id.button_license)
@@ -60,6 +63,16 @@ public class AboutActivity extends AppCompatActivity {
                         "See the License for the specific language governing permissions and\n" +
                         "limitations under the License.");
         licenseDialog = builder.create();
+    }
+
+    private void getVersionNumber() {
+        try {
+            String version = getApplicationContext().getPackageManager()
+                    .getPackageInfo(getApplicationContext().getPackageName(), 0).versionName;
+            versionnumber.setText(getString(R.string.title_version_number, version));
+        } catch (PackageManager.NameNotFoundException e) {
+            versionnumber.setText("");
+        }
     }
 
 }

@@ -117,7 +117,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     public void deleteIngredient(View view) {
         if (ingredientAlertDismissed) {
             removeRow();
-        } else {
+        } else if (table.getChildCount() > 1) {
             deleteIngredientDialog.show();
         }
     }

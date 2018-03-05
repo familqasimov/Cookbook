@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity"
-    tools:showIn="@layout/activity_categories">
+    tools:showIn="@layout/activity_categories"
+    android:animateLayoutChanges="true">
 
     <TextView
         android:layout_width="wrap_content"
@@ -17,7 +18,7 @@
         android:paddingLeft="8dp"
         android:paddingEnd="8dp"
         android:text="@string/title_no_categories"
-        android:visibility="gone"/>
+        android:visibility="visible"/>
 
     <ListView
         android:id="@+id/list_categories"
@@ -26,5 +27,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        android:animateLayoutChanges="true"
+        android:visibility="gone"/>
 </android.support.constraint.ConstraintLayout>

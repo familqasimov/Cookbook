@@ -76,9 +76,14 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
+        noRecipesText.setVisibility(View.VISIBLE);
+        sortText.setVisibility(GONE);
+        recipeList.setVisibility(GONE);
+
         createSortDialog();
         observe();
-
+        checkFirstRun();
+        makeSearchListener();
         searchEditText.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
                 searchEditText.setVisibility(View.VISIBLE);
@@ -88,13 +93,10 @@ public class MainActivity extends AppCompatActivity {
                 searchEditText.setVisibility(GONE);
             }
         });
-        makeSearchListener();
 
         if (savedInstanceState != null) {
             search = savedInstanceState.getString(STATE_SEARCH);
         }
-
-        checkFirstRun();
     }
 
     @Override
@@ -303,13 +305,16 @@ public class MainActivity extends AppCompatActivity {
                 if (combinedRecipes.size() > 0) {
                     noRecipesText.setVisibility(GONE);
                     sortText.setVisibility(View.VISIBLE);
+                    recipeList.setVisibility(VISIBLE);
                 } else {
                     noRecipesText.setVisibility(View.VISIBLE);
                     sortText.setVisibility(GONE);
+                    recipeList.setVisibility(GONE);
                 }
             } else {
                 noRecipesText.setVisibility(View.VISIBLE);
                 sortText.setVisibility(GONE);
+                recipeList.setVisibility(GONE);
             }
             liveCombinedRecipes = sortRecipes(combinedRecipes);
             adapter = new RecipeAdapter(this, combinedRecipes);
@@ -329,9 +334,7 @@ public class MainActivity extends AppCompatActivity {
         if (searchEditText.getVisibility() == View.VISIBLE) {
             searchEditText.setText("");
             searchEditText.setVisibility(View.GONE);
-            //collapse(searchEditText);
         } else {
-            //expand(searchEditText);
             searchEditText.setVisibility(View.VISIBLE);
             searchEditText.requestFocus();
         }

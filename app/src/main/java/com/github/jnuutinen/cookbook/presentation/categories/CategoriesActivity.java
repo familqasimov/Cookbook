@@ -217,11 +217,14 @@ public class CategoriesActivity extends AppCompatActivity {
             if (categories != null) {
                 if (categories.size() != 0) {
                     noCategoriesText.setVisibility(View.GONE);
+                    categoriesList.setVisibility(View.VISIBLE);
                 } else {
                     noCategoriesText.setVisibility(View.VISIBLE);
+                    categoriesList.setVisibility(View.GONE);
                 }
             } else {
                 noCategoriesText.setVisibility(View.VISIBLE);
+                categoriesList.setVisibility(View.GONE);
             }
             liveCategories = sortCategories(categories);
             categoriesList.setAdapter(new CategoryAdapter(this, liveCategories));

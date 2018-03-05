@@ -110,4 +110,7 @@
     <string name="option_introduction_recipes">Generate example recipes</string>
     <string name="option_introduction_categories">Generate example categories</string>
     <string name="recipe_name_duplicate">There\'s already a recipe with that name!</string>
+    <string name="alert_delete_ingredient">This will delete the lowest ingredient row. If you want to delete some other ingredient without deleting the lowest, just leave the field blank, and it will not be added to the recipe.</string>
+    <string name="title_dont_show_dialog">Don\'t show this dialog in the future</string>
+    <string name="title_delete_ingredient">Delete ingredient</string>
 </resources>

@@ -140,7 +140,7 @@
                 android:alpha="0.6"
                 android:background="@drawable/ic_action_remove_circle_outline"
                 android:contentDescription="@string/contentdesc_remove_ingredient"
-                android:onClick="removeRow"
+                android:onClick="deleteIngredient"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/button_add_ingredient"
                 app:layout_constraintTop_toTopOf="@id/button_add_ingredient"

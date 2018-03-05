@@ -1,12 +1,17 @@
 package com.github.jnuutinen.cookbook.presentation.editrecipe;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,7 +38,10 @@ import static com.github.jnuutinen.cookbook.presentation.createrecipe.CreateReci
 import static com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity.STATE_NAME;
 
 public class EditRecipeActivity extends AppCompatActivity {
-//private static final String TAG = EditRecipeActivity.class.getSimpleName();
+    private static final String TAG = EditRecipeActivity.class.getSimpleName();
+
+    private final String PREFS_NAME = "com.github.jnuutinen.cookbook";
+    private final String PREF_INGREDIENT_DELETE_DISMISS = "ingredient_delete_dismiss";
 
     @BindView(R.id.table_ingredients) TableLayout table;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -42,6 +50,8 @@ public class EditRecipeActivity extends AppCompatActivity {
     @BindView(R.id.spinner_category) Spinner spinnerCategory;
     @BindView(R.id.checkbox_category) CheckBox categoryCheckBox;
 
+    private AlertDialog deleteIngredientDialog;
+    private boolean ingredientAlertDismissed = false;
     private List<Category> liveCategories;
     private CategorySpinnerAdapter adapter;
     private Recipe recipe;
@@ -62,6 +72,8 @@ public class EditRecipeActivity extends AppCompatActivity {
 
         viewModel = ViewModelProviders.of(this).get(EditRecipeViewModel.class);
         observe();
+        createIngredientDeletionDialog();
+        checkPrefs();
         recipe = getIntent().getParcelableExtra("recipe");
         categoryCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -122,13 +134,46 @@ public class EditRecipeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void deleteIngredient(View view) {
+        if (ingredientAlertDismissed) {
+            removeRow();
+        } else {
+            deleteIngredientDialog.show();
+        }
+    }
+
     public void newRow(View view) {
         newRow();
     }
 
-    public void removeRow(View view) {
-        int numberOfRows = table.getChildCount();
-        if (numberOfRows > 1) table.removeViewAt(numberOfRows - 1);
+    private void checkPrefs() {
+        final boolean DOESNT_EXIST = false;
+
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean dismissed = prefs.getBoolean(PREF_INGREDIENT_DELETE_DISMISS, DOESNT_EXIST);
+
+        if (dismissed) {
+            ingredientAlertDismissed = true;
+        }
+    }
+
+    private void createIngredientDeletionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        @SuppressLint("InflateParams") View view = getLayoutInflater().inflate(R.layout.dialog_delete_ingredient, null);
+        builder.setView(view).setTitle(R.string.title_delete_ingredient)
+                .setMessage(R.string.alert_delete_ingredient)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (((CheckBox)view.findViewById(R.id.checkbox_dont_show_dialog)).isChecked()) {
+                            EditRecipeActivity.this.writePrefs();
+                        }
+                        EditRecipeActivity.this.removeRow();
+                    }
+                }).setNegativeButton(R.string.cancel, (dialog, which) -> {
+            // Cancel, do nothing
+        });
+        deleteIngredientDialog = builder.create();
     }
 
     private void getRecipeInfo() {
@@ -166,6 +211,24 @@ public class EditRecipeActivity extends AppCompatActivity {
         row.addView(ingredient);
         ingredient.requestFocus();
         table.addView(row);
+    }
+
+    private void observe() {
+        viewModel.getCategories().observe(this, categories -> {
+            liveCategories = categories;
+            adapter = new CategorySpinnerAdapter(this, categories);
+            spinnerCategory.setAdapter(adapter);
+            if (recipe.getCategoryId() != null) {
+                categoryCheckBox.setChecked(true);
+                spinnerCategory.setVisibility(View.VISIBLE);
+                for (Category c : liveCategories) {
+                    if ((int)c.getId() == recipe.getCategoryId()) {
+                        spinnerCategory.setSelection(adapter.getPosition(c));
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     private void populate(boolean fromState) {
@@ -211,22 +274,9 @@ public class EditRecipeActivity extends AppCompatActivity {
         if (table.getChildCount() == 0) newRow(new View(this));
     }
 
-    private void observe() {
-        viewModel.getCategories().observe(this, categories -> {
-            liveCategories = categories;
-            adapter = new CategorySpinnerAdapter(this, categories);
-            spinnerCategory.setAdapter(adapter);
-            if (recipe.getCategoryId() != null) {
-                categoryCheckBox.setChecked(true);
-                spinnerCategory.setVisibility(View.VISIBLE);
-                for (Category c : liveCategories) {
-                    if ((int)c.getId() == recipe.getCategoryId()) {
-                        spinnerCategory.setSelection(adapter.getPosition(c));
-                        break;
-                    }
-                }
-            }
-        });
+    private void removeRow() {
+        int numberOfRows = table.getChildCount();
+        if (numberOfRows > 1) table.removeViewAt(numberOfRows - 1);
     }
 
     private void updateRecipe() {
@@ -245,5 +295,12 @@ public class EditRecipeActivity extends AppCompatActivity {
             setResult(RESULT_OK, intent);
             finish();
         }
+    }
+
+    private void writePrefs() {
+        Log.e(TAG, "writeprefs");
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit().putBoolean(PREF_INGREDIENT_DELETE_DISMISS, true).apply();
+        ingredientAlertDismissed = true;
     }
 }

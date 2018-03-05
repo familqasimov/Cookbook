@@ -109,4 +109,5 @@
     <string name="title_introduction_example_categories">Example categories</string>
     <string name="option_introduction_recipes">Generate example recipes</string>
     <string name="option_introduction_categories">Generate example categories</string>
+    <string name="recipe_name_duplicate">There\'s already a recipe with that name!</string>
 </resources>

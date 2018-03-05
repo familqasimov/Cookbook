@@ -57,4 +57,5 @@
     <string name="title_introduction_example_categories">Esimerkkikategoriat</string>
     <string name="option_introduction_recipes">Generoi esimerkkireseptit</string>
     <string name="option_introduction_categories">Generoi esimerkkikategoriat</string>
+    <string name="recipe_name_duplicate">Tuolla nimellä on jo resepti!</string>
 </resources>

@@ -14,16 +14,22 @@ import java.util.List;
 
 public class CreateRecipeViewModel extends AndroidViewModel {
     private final LiveData<List<Category>> observableCategories;
+    private final LiveData<List<Recipe>> observableRecipes;
     private DataRepository dataRepository;
 
     public CreateRecipeViewModel(@NonNull Application application) {
         super(application);
         dataRepository = ((CookbookApp) application).getRepository();
         observableCategories = dataRepository.getLiveCategories();
+        observableRecipes = dataRepository.getLiveRecipes();
     }
 
     LiveData<List<Category>> getCategories() {
         return observableCategories;
+    }
+
+    LiveData<List<Recipe>> getRecipes() {
+        return observableRecipes;
     }
 
     void insertRecipe(Recipe recipe) {

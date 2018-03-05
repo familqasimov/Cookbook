@@ -23,6 +23,7 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.CategorySpinnerAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +44,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
     private CreateRecipeViewModel viewModel;
     private ArrayList<String> ingredients;
+    private List<Recipe> liveRecipes;
     private Integer categoryId;
     private String name;
     private String instructions;
@@ -55,8 +57,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        viewModel = ViewModelProviders.of(this).get(CreateRecipeViewModel.class);
-        populateCategoriesSpinner();
+        observe();
         categoryCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 spinnerCategory.setVisibility(View.VISIBLE);
@@ -176,21 +177,37 @@ public class CreateRecipeActivity extends AppCompatActivity {
         if (table.getChildCount() == 0) newRow(new View(this));
     }
 
-    private void populateCategoriesSpinner() {
+    private void observe() {
+        viewModel = ViewModelProviders.of(this).get(CreateRecipeViewModel.class);
         viewModel.getCategories().observe(this, categories ->
                 spinnerCategory.setAdapter(new CategorySpinnerAdapter(this, categories)));
+        viewModel.getRecipes().observe(this, recipes -> liveRecipes = recipes);
     }
 
     private void saveRecipe() {
-        if (editTextName.getText().toString().trim().length() == 0) {
+        name = editTextName.getText().toString().trim();
+        if (name.length() == 0) {
             Snackbar.make(editTextName, R.string.alert_blank_recipe_name, Snackbar.LENGTH_LONG)
                     .show();
         } else {
-            getRecipeInfo();
-            Recipe recipe = new Recipe(name, categoryId, ingredients, instructions);
-            viewModel.insertRecipe(recipe);
-            setResult(RESULT_OK, new Intent());
-            finish();
+            // Check for duplicate name
+            boolean duplicateFound = false;
+            for (Recipe r : liveRecipes) {
+                if (r.getName().toLowerCase().equals(name.toLowerCase())) {
+                    duplicateFound = true;
+                    break;
+                }
+            }
+            if (duplicateFound) {
+                Snackbar.make(editTextName, R.string.recipe_name_duplicate, Snackbar.LENGTH_LONG)
+                        .show();
+            } else {
+                getRecipeInfo();
+                Recipe recipe = new Recipe(name, categoryId, ingredients, instructions);
+                viewModel.insertRecipe(recipe);
+                setResult(RESULT_OK, new Intent());
+                finish();
+            }
         }
     }
 }

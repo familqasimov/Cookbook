@@ -20,7 +20,7 @@ public class ViewRecipeViewModel extends AndroidViewModel {
     public ViewRecipeViewModel(@NonNull Application application) {
         super(application);
         dataRepository = ((CookbookApp) application).getRepository();
-        observableCombinedRecipes = dataRepository.getLiveCombinedRecipes();
+        observableCombinedRecipes = dataRepository.getCombinedRecipes();
     }
 
     void cacheRecipe(Recipe recipe) {

@@ -116,32 +116,20 @@ public abstract class AppDatabase extends RoomDatabase {
                 instance.recipeDao().delete(recipe)));
     }
 
-    public List<Category> getAllCategories() {
-        return categoryDao().getAll();
-    }
-
-    public List<Recipe> getAllRecipes() {
-        return recipeDao().getAll();
-    }
-
-    public LiveData<List<Category>> getAllLiveCategories() {
+    public LiveData<List<Category>> getCategories() {
         return categoryDao().liveGetAll();
     }
 
-    public LiveData<List<Recipe>> getAllLiveRecipes() {
-        return recipeDao().liveGetAll();
+    public LiveData<List<Recipe>> getRecipes() {
+        return recipeDao().getAll();
+    }
+
+    public LiveData<List<Recipe>> getRecipes(Category category) {
+        return recipeDao().getByCategory(category.getId());
     }
 
     public LiveData<List<CombineDao.combinedRecipe>> getCombinedRecipes() {
         return combineDao().getCombinedRecipes();
-    }
-
-    public Category getCategoryByName(String name) {
-        return categoryDao().getByName(name);
-    }
-
-    public Recipe getRecipeByName(String name) {
-        return recipeDao().getByName(name);
     }
 
     public void insertRecipe(final Recipe recipe) {

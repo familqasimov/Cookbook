@@ -14,31 +14,31 @@ public class DataRepository {
     private static DataRepository instance;
 
     private final AppDatabase appDatabase;
-    private MediatorLiveData<List<Recipe>> observableRecipes;
-    private MediatorLiveData<List<Category>> observableCategories;
-    private MediatorLiveData<List<CombineDao.combinedRecipe>> observableCombinedRecipes;
+    private MediatorLiveData<List<Recipe>> recipes;
+    private MediatorLiveData<List<Category>> categories;
+    private MediatorLiveData<List<CombineDao.combinedRecipe>> combinedRecipes;
 
     private DataRepository(final AppDatabase appDatabase) {
         this.appDatabase = appDatabase;
-        observableRecipes = new MediatorLiveData<>();
-        observableCategories = new MediatorLiveData<>();
-        observableCombinedRecipes = new MediatorLiveData<>();
-        observableRecipes.addSource(appDatabase.getAllLiveRecipes(),
+        recipes = new MediatorLiveData<>();
+        categories = new MediatorLiveData<>();
+        combinedRecipes = new MediatorLiveData<>();
+        recipes.addSource(appDatabase.getRecipes(),
                 recipeEntities -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
-                        observableRecipes.postValue(recipeEntities);
+                        recipes.postValue(recipeEntities);
                     }
                 });
-        observableCategories.addSource(appDatabase.getAllLiveCategories(),
+        categories.addSource(appDatabase.getCategories(),
                 categoryEntities -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
-                        observableCategories.postValue(categoryEntities);
+                        categories.postValue(categoryEntities);
                     }
                 });
-        observableCombinedRecipes.addSource(appDatabase.getCombinedRecipes(),
+        combinedRecipes.addSource(appDatabase.getCombinedRecipes(),
                 combinedRecipes -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
-                        observableCombinedRecipes.postValue(combinedRecipes);
+                        this.combinedRecipes.postValue(combinedRecipes);
                     }
                 });
     }
@@ -70,16 +70,20 @@ public class DataRepository {
         instance.appDatabase.deleteRecipe(recipe);
     }
 
-    public LiveData<List<Category>> getLiveCategories() {
-        return observableCategories;
+    public LiveData<List<Category>> getCategories() {
+        return categories;
     }
 
-    public LiveData<List<Recipe>> getLiveRecipes() {
-        return observableRecipes;
+    public LiveData<List<Recipe>> getRecipes() {
+        return recipes;
     }
 
-    public LiveData<List<CombineDao.combinedRecipe>> getLiveCombinedRecipes() {
-        return observableCombinedRecipes;
+    public LiveData<List<Recipe>> getRecipes(Category category) {
+        return instance.appDatabase.getRecipes(category);
+    }
+
+    public LiveData<List<CombineDao.combinedRecipe>> getCombinedRecipes() {
+        return combinedRecipes;
     }
 
     public void insertRecipe(Recipe recipe) {

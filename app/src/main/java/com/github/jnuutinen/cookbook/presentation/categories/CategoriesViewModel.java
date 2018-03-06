@@ -19,7 +19,7 @@ public class CategoriesViewModel extends AndroidViewModel {
     public CategoriesViewModel(@NonNull Application application) {
         super(application);
         dataRepository = ((CookbookApp) application).getRepository();
-        observableCategories = dataRepository.getLiveCategories();
+        observableCategories = dataRepository.getCategories();
     }
 
     LiveData<List<Category>> getCategories() {

@@ -20,8 +20,8 @@ public class CreateRecipeViewModel extends AndroidViewModel {
     public CreateRecipeViewModel(@NonNull Application application) {
         super(application);
         dataRepository = ((CookbookApp) application).getRepository();
-        observableCategories = dataRepository.getLiveCategories();
-        observableRecipes = dataRepository.getLiveRecipes();
+        observableCategories = dataRepository.getCategories();
+        observableRecipes = dataRepository.getRecipes();
     }
 
     LiveData<List<Category>> getCategories() {

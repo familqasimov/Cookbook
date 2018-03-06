@@ -60,8 +60,8 @@ public class DatabaseTest {
 
     @Test
     public void readData() throws Exception {
-        List<Recipe> recipes = database.getAllRecipes();
-        List<Category> categories = database.getAllCategories();
+        List<Recipe> recipes = database.getRecipes().getValue();
+        List<Category> categories = database.getCategories().getValue();
 
         assertNotNull(recipes);
         assertNotNull(categories);
@@ -92,7 +92,7 @@ public class DatabaseTest {
         // Delete recipe
         recipeDao.delete(recipeDao.getByName("recipe_2"));
         assertNull(recipeDao.getByName("recipe_2"));
-        assertEquals(4, recipeDao.getAll().size());
+        assertEquals(4, recipeDao.getAll().getValue().size());
 
         // Check recipe_3's category before deleting it
         assertEquals("category_3", categoryDao.getById(recipeDao.getByName("recipe_3")

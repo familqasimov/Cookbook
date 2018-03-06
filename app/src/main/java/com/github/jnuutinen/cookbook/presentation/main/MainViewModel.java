@@ -20,8 +20,8 @@ public class MainViewModel extends AndroidViewModel {
     public MainViewModel(@NonNull Application application) {
         super(application);
         dataRepository = ((CookbookApp) application).getRepository();
-        observableRecipes = dataRepository.getLiveRecipes();
-        observableCombinedRecipes = dataRepository.getLiveCombinedRecipes();
+        observableRecipes = dataRepository.getRecipes();
+        observableCombinedRecipes = dataRepository.getCombinedRecipes();
     }
 
     LiveData<List<CombineDao.combinedRecipe>> getCombinedRecipes() {

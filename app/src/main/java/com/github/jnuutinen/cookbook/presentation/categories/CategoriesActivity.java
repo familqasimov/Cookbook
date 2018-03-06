@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
+import com.github.jnuutinen.cookbook.presentation.bycategory.RecipesByCategoryActivity;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -122,10 +123,15 @@ public class CategoriesActivity extends AppCompatActivity {
 
     @OnItemClick(R.id.list_categories)
     void showCategoryRecipes(int position) {
+        /*
         Intent intent = new Intent();
         intent.putExtra("filter", "category: " + liveCategories.get(position).getName());
         setResult(RESULT_OK, intent);
         finish();
+        */
+        Intent intent = new Intent(this, RecipesByCategoryActivity.class);
+        intent.putExtra("category", (Category)categoriesList.getAdapter().getItem(position));
+        startActivity(intent);
     }
 
     @SuppressLint("InflateParams")

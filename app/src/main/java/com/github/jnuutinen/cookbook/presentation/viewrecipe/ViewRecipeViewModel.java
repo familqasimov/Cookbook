@@ -14,13 +14,13 @@ import java.util.List;
 
 public class ViewRecipeViewModel extends AndroidViewModel {
     private DataRepository dataRepository;
-    private final LiveData<List<CombineDao.combinedRecipe>> observableCombinedRecipes;
+    private final LiveData<List<CombineDao.combinedRecipe>> combinedRecipes;
     private Recipe recipe;
 
     public ViewRecipeViewModel(@NonNull Application application) {
         super(application);
         dataRepository = ((CookbookApp) application).getRepository();
-        observableCombinedRecipes = dataRepository.getCombinedRecipes();
+        combinedRecipes = dataRepository.getCombinedRecipes();
     }
 
     void cacheRecipe(Recipe recipe) {
@@ -35,7 +35,11 @@ public class ViewRecipeViewModel extends AndroidViewModel {
         return recipe;
     }
 
-    LiveData<List<CombineDao.combinedRecipe>> getLiveCombinedRecipes() {
-        return observableCombinedRecipes;
+    LiveData<List<CombineDao.combinedRecipe>> getCombinedRecipes() {
+        return combinedRecipes;
+    }
+
+    void updateRecipe(Recipe recipe) {
+        dataRepository.updateRecipe(recipe);
     }
 }

@@ -22,6 +22,9 @@ public interface RecipeDao {
     @Query("SELECT * FROM Recipe WHERE category_id = :categoryId")
     LiveData<List<Recipe>> getByCategory(Integer categoryId);
 
+    @Query("SELECT * FROM Recipe WHERE is_favorite = 1")
+    LiveData<List<Recipe>> getFavorites();
+
     @Insert
     void insert(Recipe recipe);
 

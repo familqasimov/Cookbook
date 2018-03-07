@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation.main;
+package com.github.jnuutinen.cookbook.presentation;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -16,13 +16,13 @@ import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import java.util.ArrayList;
 import java.util.List;
 
-class RecipeAdapter extends ArrayAdapter<CombineDao.combinedRecipe> implements Filterable {
+public class RecipeAdapter extends ArrayAdapter<CombineDao.combinedRecipe> implements Filterable {
 
     private List<CombineDao.combinedRecipe> combinedRecipes;
     private List<CombineDao.combinedRecipe> filtered;
     private ItemFilter filter = new ItemFilter();
 
-    RecipeAdapter(Context context, List<CombineDao.combinedRecipe> recipes) {
+    public RecipeAdapter(Context context, List<CombineDao.combinedRecipe> recipes) {
         super(context, 0, recipes);
         combinedRecipes = recipes;
         filtered = recipes;

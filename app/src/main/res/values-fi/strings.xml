@@ -61,4 +61,8 @@
     <string name="alert_delete_ingredient">Tämä poistaa alimman ainesrivin. Jos haluat poistaa jonkun muun kuin alimman aineksen, jätä sen aineksen tekstikenttä tyhjäksi, ja sitä ei oteta huomioon reseptiä tallennettaessa.</string>
     <string name="title_dont_show_dialog">Älä näytä tätä viestiä tulevaisuudessa</string>
     <string name="title_delete_ingredient">Poista aines</string>
+    <string name="action_favorites">Suosikit</string>
+    <string name="title_no_recipes_in_category">Tässä kategoriassa ei ole reseptejä.</string>
+    <string name="title_activity_favorites">Suosikit</string>
+    <string name="title_no_favorites">Et ole lisännyt yhtäkään reseptiä suosikkeihisi.</string>
 </resources>

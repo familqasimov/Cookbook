@@ -76,6 +76,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity" />
         </activity>
+        <activity
+            android:name=".presentation.favorites.FavoritesActivity"
+            android:label="@string/title_activity_favorites"
+            android:parentActivityName=".presentation.main.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

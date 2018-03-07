@@ -1,5 +1,6 @@
 package com.github.jnuutinen.cookbook.data.db.entity;
 
+import android.annotation.SuppressLint;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
@@ -30,6 +31,8 @@ public class Recipe implements Parcelable {
     private Integer categoryId;
     private List<String> ingredients;
     private String instructions;
+    @ColumnInfo(name = "is_favorite")
+    private int isFavorite;
 
     public Recipe() {
     }
@@ -40,8 +43,10 @@ public class Recipe implements Parcelable {
         this.categoryId = categoryId;
         this.ingredients = ingredients;
         this.instructions = instructions;
+        isFavorite = 0;
     }
 
+    @SuppressLint("ParcelClassLoader")
     @Ignore
     private Recipe(Parcel in) {
         id = in.readInt();
@@ -50,6 +55,7 @@ public class Recipe implements Parcelable {
         ingredients = new ArrayList<>();
         in.readStringList(ingredients);
         instructions = in.readString();
+        isFavorite = in.readInt();
     }
 
     public static final Parcelable.Creator<Recipe> CREATOR = new Parcelable.Creator<Recipe>() {
@@ -76,6 +82,7 @@ public class Recipe implements Parcelable {
         writeInteger(dest, categoryId);
         dest.writeStringList(ingredients);
         dest.writeString(instructions);
+        dest.writeInt(isFavorite);
     }
 
     /**
@@ -145,5 +152,13 @@ public class Recipe implements Parcelable {
 
     public void setInstructions(String instructions) {
         this.instructions = instructions;
+    }
+
+    public int getIsFavorite() {
+        return isFavorite;
+    }
+
+    public void setIsFavorite(int isFavorite) {
+        this.isFavorite = isFavorite;
     }
 }

@@ -14,31 +14,47 @@ public class DataRepository {
     private static DataRepository instance;
 
     private final AppDatabase appDatabase;
-    private MediatorLiveData<List<Recipe>> recipes;
     private MediatorLiveData<List<Category>> categories;
     private MediatorLiveData<List<CombineDao.combinedRecipe>> combinedRecipes;
+    private MediatorLiveData<List<CombineDao.combinedRecipe>> favoriteCombinedRecipes;
+    private MediatorLiveData<List<Recipe>> favoriteRecipes;
+    private MediatorLiveData<List<Recipe>> recipes;
 
     private DataRepository(final AppDatabase appDatabase) {
         this.appDatabase = appDatabase;
-        recipes = new MediatorLiveData<>();
         categories = new MediatorLiveData<>();
         combinedRecipes = new MediatorLiveData<>();
-        recipes.addSource(appDatabase.getRecipes(),
-                recipeEntities -> {
-                    if (appDatabase.getDatabaseCreated().getValue() != null) {
-                        recipes.postValue(recipeEntities);
-                    }
-                });
+        favoriteCombinedRecipes = new MediatorLiveData<>();
+        favoriteRecipes = new MediatorLiveData<>();
+        recipes = new MediatorLiveData<>();
         categories.addSource(appDatabase.getCategories(),
-                categoryEntities -> {
+                data -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
-                        categories.postValue(categoryEntities);
+                        categories.postValue(data);
                     }
                 });
         combinedRecipes.addSource(appDatabase.getCombinedRecipes(),
-                combinedRecipes -> {
+                data -> {
                     if (appDatabase.getDatabaseCreated().getValue() != null) {
-                        this.combinedRecipes.postValue(combinedRecipes);
+                        combinedRecipes.postValue(data);
+                    }
+                });
+        favoriteCombinedRecipes.addSource(appDatabase.getFavoriteCombinedRecipes(),
+                data -> {
+                    if (appDatabase.getDatabaseCreated().getValue() != null) {
+                        favoriteCombinedRecipes.postValue(data);
+                    }
+                });
+        favoriteRecipes.addSource(appDatabase.getFavoriteRecipes(),
+                data -> {
+                    if (appDatabase.getDatabaseCreated().getValue() != null) {
+                        favoriteRecipes.postValue(data);
+                    }
+                });
+        recipes.addSource(appDatabase.getRecipes(),
+                data -> {
+                    if (appDatabase.getDatabaseCreated().getValue() != null) {
+                        recipes.postValue(data);
                     }
                 });
     }
@@ -74,6 +90,18 @@ public class DataRepository {
         return categories;
     }
 
+    public LiveData<List<CombineDao.combinedRecipe>> getCombinedRecipes() {
+        return combinedRecipes;
+    }
+
+    public LiveData<List<CombineDao.combinedRecipe>> getFavoriteCombinedRecipes() {
+        return favoriteCombinedRecipes;
+    }
+
+    public LiveData<List<Recipe>> getFavoriteRecipes() {
+        return favoriteRecipes;
+    }
+
     public LiveData<List<Recipe>> getRecipes() {
         return recipes;
     }
@@ -82,16 +110,12 @@ public class DataRepository {
         return instance.appDatabase.getRecipes(category);
     }
 
-    public LiveData<List<CombineDao.combinedRecipe>> getCombinedRecipes() {
-        return combinedRecipes;
+    public void insertCategory(Category category) {
+        instance.appDatabase.insertCategory(category);
     }
 
     public void insertRecipe(Recipe recipe) {
         instance.appDatabase.insertRecipe(recipe);
-    }
-
-    public void insertCategory(Category category) {
-        instance.appDatabase.insertCategory(category);
     }
 
     public void updateCategory(Category category) {

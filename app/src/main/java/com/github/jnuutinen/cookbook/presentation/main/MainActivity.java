@@ -22,9 +22,12 @@ import com.github.jnuutinen.cookbook.BuildConfig;
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
+import com.github.jnuutinen.cookbook.presentation.RecipeAdapter;
+import com.github.jnuutinen.cookbook.presentation.Utils;
 import com.github.jnuutinen.cookbook.presentation.about.AboutActivity;
 import com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity;
 import com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.favorites.FavoritesActivity;
 import com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity;
 import com.rubengees.introduction.IntroductionActivity;
 import com.rubengees.introduction.IntroductionBuilder;
@@ -32,8 +35,6 @@ import com.rubengees.introduction.Option;
 import com.rubengees.introduction.Slide;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -63,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
     private MainViewModel viewModel;
     private String search;
-    private List<CombineDao.combinedRecipe> liveCombinedRecipes;
-    private List<Recipe> liveRecipes;
+    private List<CombineDao.combinedRecipe> combinedRecipes;
+    private List<Recipe> recipes;
     private RecipeAdapter adapter;
     private AlertDialog sortDialog;
 
@@ -180,6 +181,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_sort:
                 sortDialog.show();
                 break;
+            case R.id.action_favorites:
+                startActivity(new Intent(this, FavoritesActivity.class));
+                break;
             case R.id.action_categories:
                 startActivityForResult(new Intent(this, CategoriesActivity.class),
                         REQUEST_CATEGORIES);
@@ -200,10 +204,10 @@ public class MainActivity extends AppCompatActivity {
     @OnItemClick(R.id.list_recipes)
     void viewRecipe(int position) {
         Intent intent = new Intent(this, ViewRecipeActivity.class);
-        CombineDao.combinedRecipe combined = liveCombinedRecipes.get(position);
-        if (liveRecipes != null) {
+        CombineDao.combinedRecipe combined = combinedRecipes.get(position);
+        if (recipes != null) {
             Recipe foundRecipe = null;
-            for (Recipe recipe : liveRecipes) {
+            for (Recipe recipe : recipes) {
                 if (recipe.getName().equals(combined.recipeName)) {
                     foundRecipe = recipe;
                     break;
@@ -234,9 +238,9 @@ public class MainActivity extends AppCompatActivity {
             return;
         } else if (savedVersionCode == DOESNT_EXIST) {
             new IntroductionBuilder(this).withSlides(generateSlides()).introduceMyself();
-        } else if (currentVersionCode > savedVersionCode) {
+        }/* else if (currentVersionCode > savedVersionCode) {
             // Upgrade
-        }
+        }*/
 
         // Update the shared preferences with the current version code
         prefs.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply();
@@ -298,11 +302,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void observe() {
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        viewModel.getRecipes().observe(this, recipes -> liveRecipes = recipes);
+        viewModel.getRecipes().observe(this, data -> recipes = data);
 
-        viewModel.getCombinedRecipes().observe(this, combinedRecipes -> {
-            if (combinedRecipes != null) {
-                if (combinedRecipes.size() > 0) {
+        viewModel.getCombinedRecipes().observe(this, data -> {
+            if (data != null) {
+                if (data.size() > 0) {
                     noRecipesText.setVisibility(GONE);
                     sortText.setVisibility(View.VISIBLE);
                     recipeList.setVisibility(VISIBLE);
@@ -316,8 +320,15 @@ public class MainActivity extends AppCompatActivity {
                 sortText.setVisibility(GONE);
                 recipeList.setVisibility(GONE);
             }
-            liveCombinedRecipes = sortRecipes(combinedRecipes);
-            adapter = new RecipeAdapter(this, combinedRecipes);
+            data = Utils.sortByName(data);
+            if (sort == SORT_CATEGORY) {
+                data = Utils.sortByCategory(data);
+                sortText.setText(R.string.title_sorted_by_category);
+            } else {
+                sortText.setText(R.string.title_sorted_by_name);
+            }
+            combinedRecipes = data;
+            adapter = new RecipeAdapter(this, data);
             recipeList.setAdapter(adapter);
             if (searchEditText.getVisibility() == VISIBLE) {
                 adapter.getFilter().filter(searchEditText.getText().toString());
@@ -349,37 +360,5 @@ public class MainActivity extends AppCompatActivity {
             searchEditText.requestFocus();
             searchEditText.setText(searchString);
         }
-    }
-
-    private List<CombineDao.combinedRecipe> sortRecipes(List<CombineDao.combinedRecipe> toBeSorted) {
-        // name order comparator
-        Comparator<CombineDao.combinedRecipe> nameOrder = (entry1, entry2) -> {
-            final String name1 = entry1.recipeName;
-            final String name2 = entry2.recipeName;
-            return name1.compareToIgnoreCase(name2);
-        };
-        // category order comparator
-        Comparator<CombineDao.combinedRecipe> catOrder = (entry1, entry2) -> {
-            final String cat1 = entry1.categoryName;
-            final String cat2 = entry2.categoryName;
-            if (cat1 == null && cat2 == null) {
-                return 0;
-            } else if (cat1 == null) {
-                return 1;
-            } else if (cat2 == null) {
-                return -1;
-            }
-            return cat1.compareTo(cat2);
-        };
-        // Sort by name first
-        Collections.sort(toBeSorted, nameOrder);
-        if (sort == SORT_NAME) {
-            sortText.setText(R.string.title_sorted_by_name);
-        }
-        if (sort == SORT_CATEGORY) {
-            Collections.sort(toBeSorted, catOrder);
-            sortText.setText(R.string.title_sorted_by_category);
-        }
-        return toBeSorted;
     }
 }

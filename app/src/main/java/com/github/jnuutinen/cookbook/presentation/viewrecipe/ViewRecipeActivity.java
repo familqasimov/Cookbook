@@ -3,6 +3,7 @@ package com.github.jnuutinen.cookbook.presentation.viewrecipe;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,12 +22,13 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ViewRecipeActivity extends AppCompatActivity {
     private static final int REQUEST_EDIT_RECIPE = 1;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.text_view_name) TextView name;
+    @BindView(R.id.button_favorite) FloatingActionButton favoriteButton;
     @BindView(R.id.text_view_category) TextView category;
     @BindView(R.id.text_view_ingredients) TextView ingredients;
     @BindView(R.id.text_view_instructions) TextView instructions;
@@ -81,7 +83,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_EDIT_RECIPE:
                 if (resultCode == RESULT_OK) {
-                    Snackbar.make(name, R.string.alert_recipe_saved, Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(category, R.string.alert_recipe_saved, Snackbar.LENGTH_LONG).show();
                 }
                 recipe = data.getParcelableExtra("recipe");
                 getRecipe();
@@ -110,6 +112,18 @@ public class ViewRecipeActivity extends AppCompatActivity {
         }
     }
 
+    @OnClick(R.id.button_favorite)
+    void toggleFavorite() {
+        if (recipe.getIsFavorite() == 1) {
+            recipe.setIsFavorite(0);
+            favoriteButton.setImageResource(R.drawable.ic_action_favorite_border);
+        } else {
+            recipe.setIsFavorite(1);
+            favoriteButton.setImageResource(R.drawable.ic_action_favorite);
+        }
+        viewModel.updateRecipe(recipe);
+    }
+
     private void buildDeleteDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.alert_delete_recipe);
@@ -125,17 +139,19 @@ public class ViewRecipeActivity extends AppCompatActivity {
     }
 
     private void getRecipe() {
-        name.setText(recipe.getName());
         // Category is set in observe(), when LiveData is fetched
         ingredients.setText("");
         for (int i = 0; i < recipe.getIngredients().size(); i++) {
             ingredients.append(recipe.getIngredients().get(i) + "\n");
         }
         instructions.setText(recipe.getInstructions());
+        if (recipe.getIsFavorite() == 1) {
+            favoriteButton.setImageResource(R.drawable.ic_action_favorite);
+        }
     }
 
     private void observe() {
-        viewModel.getLiveCombinedRecipes().observe(this, liveCombinedRecipes -> {
+        viewModel.getCombinedRecipes().observe(this, liveCombinedRecipes -> {
             this.liveCombinedRecipes = liveCombinedRecipes;
             if (liveCombinedRecipes != null) {
                 for (CombineDao.combinedRecipe combined : liveCombinedRecipes) {

@@ -2,6 +2,7 @@
 * Create & edit recipes
 * Optionally assign categories to recipes
 * Create & edit categories
+* Favorite recipes
 * Sort recipes alphabetically by recipe name or category
 * Search created recipes
 * Filter recipes by a specific category
@@ -10,7 +11,7 @@
 
 ## Screengrabs
 
-![cookbook](images/grabs4.png)
+![cookbook](images/grabs5.png)
 
 ## Credits
 * [Android Asset Studio](https://github.com/romannurik/AndroidAssetStudio) - Roman Nurik

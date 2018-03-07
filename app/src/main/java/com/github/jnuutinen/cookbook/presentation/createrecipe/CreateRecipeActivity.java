@@ -52,7 +52,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private boolean ingredientAlertDismissed = false;
     private CreateRecipeViewModel viewModel;
     private ArrayList<String> ingredients;
-    private List<Recipe> liveRecipes;
+    private List<Recipe> recipes;
     private Integer categoryId;
     private String name;
     private String instructions;
@@ -195,9 +195,13 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
     private void observe() {
         viewModel = ViewModelProviders.of(this).get(CreateRecipeViewModel.class);
-        viewModel.getCategories().observe(this, categories ->
-                spinnerCategory.setAdapter(new CategorySpinnerAdapter(this, categories)));
-        viewModel.getRecipes().observe(this, recipes -> liveRecipes = recipes);
+        viewModel.getCategories().observe(this, data -> {
+            if (data == null || data.size() == 0) {
+                categoryCheckBox.setEnabled(false);
+            }
+            spinnerCategory.setAdapter(new CategorySpinnerAdapter(this, data));
+        });
+        viewModel.getRecipes().observe(this, data -> recipes = data);
     }
 
     private void populate() {
@@ -238,7 +242,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         } else {
             // Check for duplicate name
             boolean duplicateFound = false;
-            for (Recipe r : liveRecipes) {
+            for (Recipe r : recipes) {
                 if (r.getName().toLowerCase().equals(name.toLowerCase())) {
                     duplicateFound = true;
                     break;

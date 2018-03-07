@@ -42,7 +42,7 @@ public class CategoriesActivity extends AppCompatActivity {
     private AlertDialog deleteDialog;
     private AlertDialog editCategoryDialog;
     private CategoriesViewModel viewModel;
-    private List<Category> liveCategories;
+    private List<Category> categories;
     private Category editedCategory;
     private View dialogView;
 
@@ -96,7 +96,7 @@ public class CategoriesActivity extends AppCompatActivity {
                 item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.action_edit_category:
-                editedCategory = liveCategories.get(info.position);
+                editedCategory = categories.get(info.position);
                 editCategoryDialog.setTitle(getString(R.string.title_editing_category,
                         editedCategory.getName()));
                 editCategoryDialog.show();
@@ -104,7 +104,7 @@ public class CategoriesActivity extends AppCompatActivity {
                         .getName());
                 return true;
             case R.id.action_delete_category:
-                editedCategory = liveCategories.get(info.position);
+                editedCategory = categories.get(info.position);
                 deleteDialog.setTitle(getString(R.string.title_deleting_category,
                         editedCategory.getName()));
                 deleteDialog.show();
@@ -123,12 +123,6 @@ public class CategoriesActivity extends AppCompatActivity {
 
     @OnItemClick(R.id.list_categories)
     void showCategoryRecipes(int position) {
-        /*
-        Intent intent = new Intent();
-        intent.putExtra("filter", "category: " + liveCategories.get(position).getName());
-        setResult(RESULT_OK, intent);
-        finish();
-        */
         Intent intent = new Intent(this, RecipesByCategoryActivity.class);
         intent.putExtra("category", (Category)categoriesList.getAdapter().getItem(position));
         startActivity(intent);
@@ -149,7 +143,7 @@ public class CategoriesActivity extends AppCompatActivity {
                     } else {
                         // Check for duplicate category
                         boolean duplicateFound = false;
-                        for (Category c : liveCategories) {
+                        for (Category c : categories) {
                             if (c.getName().toLowerCase().equals(categoryName.toLowerCase())) {
                                 duplicateFound = true;
                                 Snackbar.make(categoriesList, R.string.category_name_duplicate,
@@ -195,7 +189,7 @@ public class CategoriesActivity extends AppCompatActivity {
                     } else {
                         // Check for duplicate category
                         boolean duplicateFound = false;
-                        for (Category c : liveCategories) {
+                        for (Category c : categories) {
                             if (c.getName().toLowerCase().equals(categoryName.toLowerCase())
                                     && c != editedCategory) {
                                 duplicateFound = true;
@@ -219,21 +213,14 @@ public class CategoriesActivity extends AppCompatActivity {
 
     private void observe() {
         viewModel = ViewModelProviders.of(this).get(CategoriesViewModel.class);
-        viewModel.getCategories().observe(this, categories -> {
-            if (categories != null) {
-                if (categories.size() != 0) {
-                    noCategoriesText.setVisibility(View.GONE);
-                    categoriesList.setVisibility(View.VISIBLE);
-                } else {
-                    noCategoriesText.setVisibility(View.VISIBLE);
-                    categoriesList.setVisibility(View.GONE);
-                }
-            } else {
+        viewModel.getCategories().observe(this, data -> {
+            if (data == null || data.size() == 0) {
                 noCategoriesText.setVisibility(View.VISIBLE);
-                categoriesList.setVisibility(View.GONE);
+            } else {
+                noCategoriesText.setVisibility(View.GONE);
             }
-            liveCategories = sortCategories(categories);
-            categoriesList.setAdapter(new CategoryAdapter(this, liveCategories));
+            categories = sortCategories(data);
+            categoriesList.setAdapter(new CategoryAdapter(this, categories));
         });
     }
 

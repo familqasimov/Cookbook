@@ -17,10 +17,9 @@
         android:paddingLeft="8dp"
         android:paddingEnd="8dp"
         android:text="@string/title_no_recipes_in_category"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
     <ListView
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/text_no_recipes"

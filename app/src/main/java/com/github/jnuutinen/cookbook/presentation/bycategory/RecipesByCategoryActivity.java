@@ -67,19 +67,13 @@ public class RecipesByCategoryActivity extends AppCompatActivity {
 
     private void observe() {
         ViewModelProviders.of(this).get(RecipesByCategoryViewModel.class)
-                .getLiveRecipesByCategory(category).observe(this, recipes -> {
-                list.setAdapter(new PlainRecipeAdapter(this, recipes));
-                if (recipes == null) {
-                    list.setVisibility(View.GONE);
-                    noRecipesText.setVisibility(View.VISIBLE);
-                } else if (recipes.size() == 0) {
-                    list.setVisibility(View.GONE);
-                    noRecipesText.setVisibility(View.VISIBLE);
-                } else {
-                    list.setVisibility(View.VISIBLE);
-                    noRecipesText.setVisibility(View.GONE
-                    );
-                }
+                .getLiveRecipesByCategory(category).observe(this, data -> {
+                    if (data == null || data.size() == 0) {
+                        noRecipesText.setVisibility(View.VISIBLE);
+                    } else {
+                        noRecipesText.setVisibility(View.GONE);
+                    }
+                    list.setAdapter(new PlainRecipeAdapter(this, data));
         });
     }
 

@@ -68,20 +68,15 @@ public class FavoritesActivity extends AppCompatActivity {
     private void observe() {
         ViewModelProviders.of(this).get(FavoritesViewModel.class)
                 .getFavoriteCombinedRecipes().observe(this, data -> {
+                    if (data == null || data.size() == 0) {
+                        noFavoritesText.setVisibility(View.VISIBLE);
+                    } else {
+                        noFavoritesText.setVisibility(View.GONE);
+                    }
                     data = Utils.sortByName(data);
                     combinedRecipes = data;
                     adapter = new RecipeAdapter(this, data);
                     favoritesList.setAdapter(adapter);
-                    if (data == null) {
-                        noFavoritesText.setVisibility(View.VISIBLE);
-                        favoritesList.setVisibility(View.GONE);
-                    } else if (data.size() == 0) {
-                        noFavoritesText.setVisibility(View.VISIBLE);
-                        favoritesList.setVisibility(View.GONE);
-                    } else {
-                        noFavoritesText.setVisibility(View.GONE);
-                        favoritesList.setVisibility(View.VISIBLE);
-                    }
         });
         ViewModelProviders.of(this).get(FavoritesViewModel.class)
                 .getFavoriteRecipes().observe(this, data -> recipes = data);

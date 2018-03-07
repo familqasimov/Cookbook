@@ -52,7 +52,7 @@ public class EditRecipeActivity extends AppCompatActivity {
 
     private AlertDialog deleteIngredientDialog;
     private boolean ingredientAlertDismissed = false;
-    private List<Category> liveCategories;
+    private List<Category> categories;
     private CategorySpinnerAdapter adapter;
     private Recipe recipe;
     private EditRecipeViewModel viewModel;
@@ -214,14 +214,17 @@ public class EditRecipeActivity extends AppCompatActivity {
     }
 
     private void observe() {
-        viewModel.getCategories().observe(this, categories -> {
-            liveCategories = categories;
-            adapter = new CategorySpinnerAdapter(this, categories);
+        viewModel.getCategories().observe(this, data -> {
+            if (data == null || data.size() == 0) {
+                categoryCheckBox.setEnabled(false);
+            }
+            categories = data;
+            adapter = new CategorySpinnerAdapter(this, data);
             spinnerCategory.setAdapter(adapter);
             if (recipe.getCategoryId() != null) {
                 categoryCheckBox.setChecked(true);
                 spinnerCategory.setVisibility(View.VISIBLE);
-                for (Category c : liveCategories) {
+                for (Category c : categories) {
                     if ((int)c.getId() == recipe.getCategoryId()) {
                         spinnerCategory.setSelection(adapter.getPosition(c));
                         break;

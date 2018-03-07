@@ -77,10 +77,6 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        noRecipesText.setVisibility(View.VISIBLE);
-        sortText.setVisibility(GONE);
-        recipeList.setVisibility(GONE);
-
         createSortDialog();
         observe();
         checkFirstRun();
@@ -305,20 +301,12 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getRecipes().observe(this, data -> recipes = data);
 
         viewModel.getCombinedRecipes().observe(this, data -> {
-            if (data != null) {
-                if (data.size() > 0) {
-                    noRecipesText.setVisibility(GONE);
-                    sortText.setVisibility(View.VISIBLE);
-                    recipeList.setVisibility(VISIBLE);
-                } else {
-                    noRecipesText.setVisibility(View.VISIBLE);
-                    sortText.setVisibility(GONE);
-                    recipeList.setVisibility(GONE);
-                }
-            } else {
-                noRecipesText.setVisibility(View.VISIBLE);
+            if (data == null || data.size() == 0) {
+                noRecipesText.setVisibility(VISIBLE);
                 sortText.setVisibility(GONE);
-                recipeList.setVisibility(GONE);
+            } else {
+                noRecipesText.setVisibility(GONE);
+                sortText.setVisibility(VISIBLE);
             }
             data = Utils.sortByName(data);
             if (sort == SORT_CATEGORY) {

@@ -18,7 +18,7 @@
         android:paddingLeft="8dp"
         android:paddingEnd="8dp"
         android:text="@string/title_no_categories"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
     <ListView
         android:id="@+id/list_categories"
@@ -27,6 +27,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 </android.support.constraint.ConstraintLayout>

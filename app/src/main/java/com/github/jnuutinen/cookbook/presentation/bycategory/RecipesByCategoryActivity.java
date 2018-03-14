@@ -14,7 +14,7 @@ import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.main.MainActivity;
-import com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.view.ViewRecipeActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

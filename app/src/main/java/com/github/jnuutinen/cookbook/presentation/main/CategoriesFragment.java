@@ -1,89 +1,97 @@
 package com.github.jnuutinen.cookbook.presentation.main;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
+import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
+import com.github.jnuutinen.cookbook.presentation.Utils;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link CategoriesFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link CategoriesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class CategoriesFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
+    private CategoryFragmentListener mListener;
+    private TextView noCategoriesText;
+    private ExpandableListView categoryList;
+    private List<Category> categories;
+    private List<String> stringCategories;
 
     public CategoriesFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CategoriesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CategoriesFragment newInstance(String param1, String param2) {
-        CategoriesFragment fragment = new CategoriesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public static CategoriesFragment newInstance() {
+        return new CategoriesFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_categories, container, false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        //noinspection ConstantConditions
+        MenuInflater menuInflater = getActivity().getMenuInflater();
+        menuInflater.inflate(R.menu.context_menu_categories, menu);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        noCategoriesText = view.findViewById(R.id.text_no_categories);
+        categoryList = view.findViewById(R.id.list_categories);
+
+        categoryList.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
+            if (mListener != null) {
+                mListener.onRecipeSelected(parent.getExpandableListAdapter()
+                        .getChild(groupPosition, childPosition).toString());
+            }
+            return false;
+        });
+
+        registerForContextMenu(categoryList);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof CategoryFragmentListener) {
+            mListener = (CategoryFragmentListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnRecipeSelectedListener");
         }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        observe();
     }
 
     @Override
@@ -92,18 +100,91 @@ public class CategoriesFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView
+                .ExpandableListContextMenuInfo)
+                item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.action_edit_category:
+                if (mListener != null) {
+                    String category = stringCategories
+                            .get(ExpandableListView.getPackedPositionGroup(info.packedPosition));
+                    for (Category c : categories) {
+                        if (c.getName().equals(category)) {
+                            mListener.onCategoryEdit(c);
+                        }
+                    }
+                }
+                return true;
+            case R.id.action_delete_category:
+                if (mListener != null) {
+                    String category = stringCategories
+                            .get(ExpandableListView.getPackedPositionGroup(info.packedPosition));
+                    for (Category c : categories) {
+                        if (c.getName().equals(category)) {
+                            mListener.onCategoryDelete(c);
+                        }
+                    }
+                }
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+    private void observe() {
+        //noinspection ConstantConditions
+        MainViewModel viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        viewModel.getCategories().observe(this, data -> categories = data);
+
+        viewModel.getCombinedRecipes().observe(this, data -> {
+            if (data == null || data.size() == 0) {
+                noCategoriesText.setVisibility(View.VISIBLE);
+            } else {
+                noCategoriesText.setVisibility(View.GONE);
+            }
+            stringCategories = new ArrayList<>();
+            Map<String, List<String>> categoryMap = new HashMap<>();
+            String noCategory = getResources().getString(R.string.recipe_no_category);
+            if (data != null) {
+                for (CombineDao.combinedRecipe combined : data) {
+                    if (!stringCategories.contains(combined.categoryName)) {
+                        if (combined.categoryName == null) {
+                            if (!stringCategories.contains(noCategory)) {
+                                stringCategories.add(noCategory);
+                            }
+                        } else {
+                            stringCategories.add(combined.categoryName);
+                        }
+                    }
+                    if (categoryMap.containsKey(combined.categoryName)) {
+                        categoryMap.get(combined.categoryName).add(combined.recipeName);
+                    } else {
+                        if (combined.categoryName == null) {
+                            if (!categoryMap.containsKey(noCategory)) {
+                                ArrayList<String> a = new ArrayList<>();
+                                a.add(combined.recipeName);
+                                categoryMap.put(noCategory, a);
+                            } else {
+                                categoryMap.get(noCategory).add(combined.recipeName);
+                            }
+                        } else {
+                            ArrayList<String> a = new ArrayList<>();
+                            a.add(combined.recipeName);
+                            categoryMap.put(combined.categoryName, a);
+                        }
+                    }
+                }
+            }
+
+            categoryList.setAdapter(new CategoryAdapter(getContext(), stringCategories,
+                    categoryMap));
+        });
+    }
+
+    public interface CategoryFragmentListener {
+        void onRecipeSelected(String name);
+        void onCategoryEdit(Category category);
+        void onCategoryDelete(Category category);
     }
 }

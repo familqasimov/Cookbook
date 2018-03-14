@@ -115,7 +115,17 @@
     <string name="title_delete_ingredient">Delete ingredient</string>
     <string name="title_activity_recipes_by_category" translatable="false">RecipesByCategoryActivity</string>
     <string name="title_no_recipes_in_category">There are no recipes in this category.</string>
-    <string name="action_favorites">Favorites</string>
-    <string name="title_activity_favorites">Favorites</string>
     <string name="title_no_favorites">You haven\'t added any recipes to Favorites.</string>
+    <string name="tab_text_1">Recipes</string>
+    <string name="tab_text_3">Categories</string>
+    <string name="tab_text_2">Favorites</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <!-- TODO: Remove or change this placeholder text -->
 </resources>

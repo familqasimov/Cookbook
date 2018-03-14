@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation.viewrecipe;
+package com.github.jnuutinen.cookbook.presentation.view;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
-import com.github.jnuutinen.cookbook.presentation.editrecipe.EditRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.edit.EditRecipeActivity;
 
 import java.util.List;
 

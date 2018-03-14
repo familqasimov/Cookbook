@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation.createrecipe;
+package com.github.jnuutinen.cookbook.presentation.create;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;

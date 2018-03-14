@@ -1,4 +1,4 @@
-package com.github.jnuutinen.cookbook.presentation.editrecipe;
+package com.github.jnuutinen.cookbook.presentation.edit;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -33,9 +33,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity.STATE_INGREDIENTS;
-import static com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity.STATE_INSTRUCTIONS;
-import static com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity.STATE_NAME;
+import static com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity.STATE_INGREDIENTS;
+import static com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity.STATE_INSTRUCTIONS;
+import static com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity.STATE_NAME;
 
 public class EditRecipeActivity extends AppCompatActivity {
     private static final String TAG = EditRecipeActivity.class.getSimpleName();

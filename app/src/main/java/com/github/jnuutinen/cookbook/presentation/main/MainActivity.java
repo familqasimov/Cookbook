@@ -1,5 +1,6 @@
 package com.github.jnuutinen.cookbook.presentation.main;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,19 +11,22 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 import com.github.jnuutinen.cookbook.BuildConfig;
 import com.github.jnuutinen.cookbook.R;
+import com.github.jnuutinen.cookbook.data.db.entity.Category;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.about.AboutActivity;
-import com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity;
-import com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity;
-import com.github.jnuutinen.cookbook.presentation.favorites.FavoritesActivity;
-import com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.view.ViewRecipeActivity;
 import com.rubengees.introduction.IntroductionActivity;
 import com.rubengees.introduction.IntroductionBuilder;
 import com.rubengees.introduction.Option;
@@ -35,9 +39,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainFragmentActivity extends AppCompatActivity implements
-        AllRecipesFragment.OnRecipeSelectedListener {
-    //private static final String TAG = MainFragmentActivity.class.getSimpleName();
+public class MainActivity extends AppCompatActivity implements
+        AllRecipesFragment.OnRecipeSelectedListener,
+        CategoriesFragment.CategoryFragmentListener {
+    //private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_ADD_RECIPE = 1;
     public static final int REQUEST_VIEW_RECIPE = 2;
 
@@ -46,15 +51,20 @@ public class MainFragmentActivity extends AppCompatActivity implements
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     private MainViewModel viewModel;
+    private List<Category> categories;
+    private List<Recipe> recipes;
+    private Category editedCategory;
+    private AlertDialog deleteCategoryDialog;
+    private AlertDialog editCategoryDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_fragment);
+        setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        observe();
 
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -63,6 +73,8 @@ public class MainFragmentActivity extends AppCompatActivity implements
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
+        buildDeleteCategoryDialog();
+        buildEditCategoryDialog();
         checkFirstRun();
     }
 
@@ -75,6 +87,22 @@ public class MainFragmentActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setIconifiedByDefault(false);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // TODO: search filter
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -134,16 +162,99 @@ public class MainFragmentActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onCategoryDelete(Category category) {
+        editedCategory = category;
+        deleteCategoryDialog.setTitle(getString(R.string.title_deleting_category,
+                editedCategory.getName()));
+        deleteCategoryDialog.show();
+    }
+
+    @SuppressLint("InflateParams")
+    @Override
+    public void onCategoryEdit(Category category) {
+        editedCategory = category;
+        editCategoryDialog.setTitle(getString(R.string.title_editing_category,
+                category.getName()));
+        editCategoryDialog.show();
+        ((EditText) getLayoutInflater().inflate(R.layout.dialog_edit_category, null)
+                .findViewById(R.id.edit_category_name)).setText(category.getName());
+    }
+
+    @Override
     public void onRecipeSelected(Recipe recipe) {
         Intent intent = new Intent(this, ViewRecipeActivity.class);
         intent.putExtra("recipe", recipe);
         startActivityForResult(intent, REQUEST_VIEW_RECIPE);
     }
 
+    @Override
+    public void onRecipeSelected(String name) {
+        Recipe recipe = null;
+        for (Recipe r : recipes) {
+            if (r.getName().equals(name)) {
+                recipe = r;
+                break;
+            }
+        }
+        if (recipe != null) {
+            Intent intent = new Intent(this, ViewRecipeActivity.class);
+            intent.putExtra("recipe", recipe);
+            startActivityForResult(intent, REQUEST_VIEW_RECIPE);
+        }
+    }
+
     @OnClick(R.id.button_add_recipe)
     void addRecipe() {
         startActivityForResult(new Intent(this, CreateRecipeActivity.class),
                 REQUEST_ADD_RECIPE);
+    }
+
+    private void buildDeleteCategoryDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.alert_delete_category)
+                .setPositiveButton(R.string.yes, (dialog, which) ->
+                        viewModel.deleteCategory(editedCategory))
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
+                    // Do nothing
+                });
+        deleteCategoryDialog = builder.create();
+
+    }
+
+    @SuppressLint("InflateParams")
+    private void buildEditCategoryDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_category, null);
+        editCategoryDialog = builder.setView(dialogView)
+                .setPositiveButton(R.string.action_save, (dialog, which) -> {
+                    String categoryName = ((EditText) dialogView
+                            .findViewById(R.id.edit_category_name)).getText().toString().trim();
+                    if (categoryName.length() == 0) {
+                        Snackbar.make(toolbar, R.string.alert_blank_category_name,
+                                Snackbar.LENGTH_LONG).show();
+                    } else {
+                        // Check for duplicate category
+                        boolean duplicateFound = false;
+                        for (Category c : categories) {
+                            if (c.getName().toLowerCase().equals(categoryName.toLowerCase())
+                                    && c != editedCategory) {
+                                duplicateFound = true;
+                                Snackbar.make(toolbar, R.string.category_name_duplicate,
+                                        Snackbar.LENGTH_LONG).show();
+                                break;
+                            }
+                        }
+                        if (!duplicateFound) {
+                            editedCategory.setName(categoryName);
+                            viewModel.updateCategory(editedCategory);
+                            Snackbar.make(toolbar, R.string.alert_category_saved,
+                                    Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+                    ((EditText) dialogView.findViewById(R.id.edit_category_name)).setText("");
+                }).setNegativeButton(R.string.cancel, (dialog, which) -> {
+                    // Canceled, do nothing
+                }).create();
     }
 
     private void checkFirstRun() {
@@ -185,6 +296,12 @@ public class MainFragmentActivity extends AppCompatActivity implements
         return result;
     }
 
+    private void observe() {
+        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        viewModel.getCategories().observe(this, data -> categories = data);
+        viewModel.getRecipes().observe(this, data -> recipes = data);
+    }
+
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         SectionsPagerAdapter(FragmentManager fm) {
@@ -193,20 +310,19 @@ public class MainFragmentActivity extends AppCompatActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 default:
                     return AllRecipesFragment.newInstance();
                 case 1:
                     return FavoriteRecipesFragment.newInstance();
+                case 2:
+                    return CategoriesFragment.newInstance();
             }
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 2;
+            return 3;
         }
     }
 }

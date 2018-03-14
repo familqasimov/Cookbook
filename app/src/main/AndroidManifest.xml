@@ -21,9 +21,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+
         </activity>
         <activity
-            android:name=".presentation.createrecipe.CreateRecipeActivity"
+            android:name=".presentation.create.CreateRecipeActivity"
             android:label="@string/title_activity_create_recipe"
             android:parentActivityName=".presentation.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -32,7 +38,7 @@
                 android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
         </activity>
         <activity
-            android:name=".presentation.viewrecipe.ViewRecipeActivity"
+            android:name=".presentation.view.ViewRecipeActivity"
             android:label="@string/title_activity_view_recipe"
             android:parentActivityName=".presentation.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -41,22 +47,13 @@
                 android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
         </activity>
         <activity
-            android:name=".presentation.editrecipe.EditRecipeActivity"
+            android:name=".presentation.edit.EditRecipeActivity"
             android:label="@string/title_activity_edit_recipe"
-            android:parentActivityName=".presentation.viewrecipe.ViewRecipeActivity"
+            android:parentActivityName=".presentation.view.ViewRecipeActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.jnuutinen.cookbook.presentation.viewrecipe.ViewRecipeActivity" />
-        </activity>
-        <activity
-            android:name=".presentation.categories.CategoriesActivity"
-            android:label="@string/title_activity_edit_categories"
-            android:parentActivityName=".presentation.main.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.jnuutinen.cookbook.presentation.main.MainActivity" />
+                android:value="com.github.jnuutinen.cookbook.presentation.view.ViewRecipeActivity" />
         </activity>
         <activity
             android:name=".presentation.about.AboutActivity"
@@ -70,15 +67,6 @@
         <activity
             android:name=".presentation.bycategory.RecipesByCategoryActivity"
             android:label="@string/title_activity_recipes_by_category"
-            android:parentActivityName=".presentation.categories.CategoriesActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.jnuutinen.cookbook.presentation.categories.CategoriesActivity" />
-        </activity>
-        <activity
-            android:name=".presentation.favorites.FavoritesActivity"
-            android:label="@string/title_activity_favorites"
             android:parentActivityName=".presentation.main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

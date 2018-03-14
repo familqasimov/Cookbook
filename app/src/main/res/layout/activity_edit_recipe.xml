@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity"
+    tools:context="com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity"
     android:animateLayoutChanges="true">
 
     <android.support.design.widget.AppBarLayout

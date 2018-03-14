@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.github.jnuutinen.cookbook.presentation.createrecipe.CreateRecipeActivity"
+    tools:context="com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity"
     tools:showIn="@layout/activity_create_recipe"
     android:animateLayoutChanges="true">
 

@@ -11,15 +11,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
-import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
-import com.github.jnuutinen.cookbook.presentation.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,11 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 public class CategoriesFragment extends Fragment {
+    private static final String TAG = CategoriesFragment.class.getSimpleName();
 
-    private CategoryFragmentListener mListener;
-    private TextView noCategoriesText;
-    private ExpandableListView categoryList;
     private List<Category> categories;
+    private CategoryAdapter adapter;
+    private ExpandableListView categoryList;
+    private List<CombineDao.combinedRecipe> combinedRecipes;
+    private AllRecipesFragment.RecipeFragmentListener listener;
+    private TextView noCategoriesText;
     private List<String> stringCategories;
 
     public CategoriesFragment() {
@@ -49,7 +49,6 @@ public class CategoriesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_categories, container, false);
     }
 
@@ -58,17 +57,33 @@ public class CategoriesFragment extends Fragment {
         super.onCreateContextMenu(menu, v, menuInfo);
         //noinspection ConstantConditions
         MenuInflater menuInflater = getActivity().getMenuInflater();
-        menuInflater.inflate(R.menu.context_menu_categories, menu);
+
+        ExpandableListView.ExpandableListContextMenuInfo info =
+                (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
+
+        // Context menu for groups (categories)
+        if (type ==  ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+
+            // don't show context menu for 'no category' group
+            String category = stringCategories
+                    .get(ExpandableListView.getPackedPositionGroup(info.packedPosition));
+            if (!category.equals(getResources().getString(R.string.recipe_no_category))) {
+                menuInflater.inflate(R.menu.context_menu_categories, menu);
+            }
+        } else if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            // Context menu for children (recipes)
+            menuInflater.inflate(R.menu.context_menu_recipe, menu);
+        }
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         noCategoriesText = view.findViewById(R.id.text_no_categories);
         categoryList = view.findViewById(R.id.list_categories);
-
         categoryList.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
-            if (mListener != null) {
-                mListener.onRecipeSelected(parent.getExpandableListAdapter()
+            if (listener != null) {
+                listener.onRecipeSelected(parent.getExpandableListAdapter()
                         .getChild(groupPosition, childPosition).toString());
             }
             return false;
@@ -80,11 +95,11 @@ public class CategoriesFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof CategoryFragmentListener) {
-            mListener = (CategoryFragmentListener) context;
+        if (context instanceof AllRecipesFragment.RecipeFragmentListener) {
+            listener = (AllRecipesFragment.RecipeFragmentListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnRecipeSelectedListener");
+                    + " must implement RecipeFragmentListener");
         }
     }
 
@@ -97,66 +112,85 @@ public class CategoriesFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView
-                .ExpandableListContextMenuInfo)
-                item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.action_edit_category:
-                if (mListener != null) {
-                    String category = stringCategories
-                            .get(ExpandableListView.getPackedPositionGroup(info.packedPosition));
-                    for (Category c : categories) {
-                        if (c.getName().equals(category)) {
-                            mListener.onCategoryEdit(c);
+        if (getUserVisibleHint()) {
+            ExpandableListView.ExpandableListContextMenuInfo info = (ExpandableListView
+                    .ExpandableListContextMenuInfo)
+                    item.getMenuInfo();
+            String selectedRecipeName;
+            switch (item.getItemId()) {
+                case R.id.action_edit_category:
+                    if (listener != null) {
+                        String category = stringCategories
+                                .get(ExpandableListView.getPackedPositionGroup(info.packedPosition));
+                        for (Category c : categories) {
+                            if (c.getName().equals(category)) {
+                                listener.onCategoryEdit(c);
+                            }
                         }
                     }
-                }
-                return true;
-            case R.id.action_delete_category:
-                if (mListener != null) {
-                    String category = stringCategories
-                            .get(ExpandableListView.getPackedPositionGroup(info.packedPosition));
-                    for (Category c : categories) {
-                        if (c.getName().equals(category)) {
-                            mListener.onCategoryDelete(c);
+                    return true;
+                case R.id.action_delete_category:
+                    if (listener != null) {
+                        String category = stringCategories
+                                .get(ExpandableListView.getPackedPositionGroup(info.packedPosition));
+                        for (Category c : categories) {
+                            if (c.getName().equals(category)) {
+                                listener.onCategoryDelete(c);
+                            }
                         }
                     }
-                }
-                return true;
-            default:
-                return super.onContextItemSelected(item);
+                    return true;
+                case R.id.action_edit_recipe:
+                    selectedRecipeName = adapter.getChild(ExpandableListView
+                            .getPackedPositionGroup(info.packedPosition), ExpandableListView
+                            .getPackedPositionChild(info.packedPosition)).toString();
+                    listener.onRecipeEdit(selectedRecipeName);
+                    return true;
+                case R.id.action_share:
+                    selectedRecipeName = adapter.getChild(ExpandableListView
+                            .getPackedPositionGroup(info.packedPosition), ExpandableListView
+                            .getPackedPositionChild(info.packedPosition)).toString();
+                    listener.onRecipeShare(selectedRecipeName);
+                    return true;
+                case R.id.action_delete_recipe:
+                    selectedRecipeName = adapter.getChild(ExpandableListView
+                            .getPackedPositionGroup(info.packedPosition), ExpandableListView
+                            .getPackedPositionChild(info.packedPosition)).toString();
+                    listener.onRecipeDelete(selectedRecipeName);
+                    return true;
+                default:
+                    return super.onContextItemSelected(item);
+            }
         }
+        return false;
     }
+
     private void observe() {
         //noinspection ConstantConditions
         MainViewModel viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         viewModel.getCategories().observe(this, data -> categories = data);
 
         viewModel.getCombinedRecipes().observe(this, data -> {
+            combinedRecipes = data;
             if (data == null || data.size() == 0) {
                 noCategoriesText.setVisibility(View.VISIBLE);
             } else {
                 noCategoriesText.setVisibility(View.GONE);
             }
             stringCategories = new ArrayList<>();
+            for (Category c : categories) {
+                stringCategories.add(c.getName());
+            }
+            stringCategories.add(getResources().getString(R.string.recipe_no_category));
             Map<String, List<String>> categoryMap = new HashMap<>();
             String noCategory = getResources().getString(R.string.recipe_no_category);
             if (data != null) {
                 for (CombineDao.combinedRecipe combined : data) {
-                    if (!stringCategories.contains(combined.categoryName)) {
-                        if (combined.categoryName == null) {
-                            if (!stringCategories.contains(noCategory)) {
-                                stringCategories.add(noCategory);
-                            }
-                        } else {
-                            stringCategories.add(combined.categoryName);
-                        }
-                    }
                     if (categoryMap.containsKey(combined.categoryName)) {
                         categoryMap.get(combined.categoryName).add(combined.recipeName);
                     } else {
@@ -176,15 +210,8 @@ public class CategoriesFragment extends Fragment {
                     }
                 }
             }
-
-            categoryList.setAdapter(new CategoryAdapter(getContext(), stringCategories,
-                    categoryMap));
+            adapter = new CategoryAdapter(getContext(), stringCategories, categoryMap);
+            categoryList.setAdapter(adapter);
         });
-    }
-
-    public interface CategoryFragmentListener {
-        void onRecipeSelected(String name);
-        void onCategoryEdit(Category category);
-        void onCategoryDelete(Category category);
     }
 }

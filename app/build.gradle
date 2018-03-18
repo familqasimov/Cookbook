@@ -8,7 +8,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "0.2.0"
+        versionName "0.3.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -41,9 +41,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support:support-annotations:27.1.0'
 
-    // Espresso
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
     // Room persistence
     implementation 'android.arch.persistence.room:runtime:1.0.0'
     annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
@@ -61,10 +58,6 @@ dependencies {
     // Butterknife
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-
-    // Droidparts ClearableEditText
-    compile 'org.droidparts:droidparts-misc:3.2.5'
-    //compile 'org.droidparts:droidparts-support:3.2.5'
 
     // Introduction
     implementation 'com.github.rubengees:introduction:2.0.0'

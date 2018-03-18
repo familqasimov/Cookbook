@@ -3,7 +3,6 @@ package com.github.jnuutinen.cookbook.presentation.main;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,6 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.R;
-import com.github.jnuutinen.cookbook.data.db.entity.Category;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +20,7 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
     private List<String> groups;
     private Map<String, List<String>> data;
 
-    public CategoryAdapter(Context context, List<String> groups, Map<String, List<String>> data) {
+    CategoryAdapter(Context context, List<String> groups, Map<String, List<String>> data) {
         this.context = context;
         this.groups = groups;
         this.data = data;
@@ -35,7 +33,11 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return data.get(groups.get(groupPosition)).size();
+        try {
+            return data.get(groups.get(groupPosition)).size();
+        } catch (NullPointerException npe) {
+            return 0;
+        }
     }
 
     @Override

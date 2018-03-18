@@ -5,11 +5,13 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +20,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.github.jnuutinen.cookbook.BuildConfig;
 import com.github.jnuutinen.cookbook.R;
@@ -26,6 +31,7 @@ import com.github.jnuutinen.cookbook.data.db.entity.Category;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.about.AboutActivity;
 import com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity;
+import com.github.jnuutinen.cookbook.presentation.edit.EditRecipeActivity;
 import com.github.jnuutinen.cookbook.presentation.view.ViewRecipeActivity;
 import com.rubengees.introduction.IntroductionActivity;
 import com.rubengees.introduction.IntroductionBuilder;
@@ -40,22 +46,36 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements
-        AllRecipesFragment.OnRecipeSelectedListener,
-        CategoriesFragment.CategoryFragmentListener {
+        AllRecipesFragment.RecipeFragmentListener {
     //private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String FILTER_RECIPE_ACTION = "com.github.jnuutinen.cookbook.FILTER_RECIPE";
     private static final int REQUEST_ADD_RECIPE = 1;
-    public static final int REQUEST_VIEW_RECIPE = 2;
+    public static final int REQUEST_EDIT_RECIPE = 2;
+    public static final int REQUEST_VIEW_RECIPE = 3;
 
-    @BindView(R.id.container) ViewPager mViewPager;
+    @BindView(R.id.button_add) FloatingActionButton addButton;
+    @BindView(R.id.button_add_category) FloatingActionButton addCategoryButton;
+    @BindView(R.id.text_add_category) TextView addCategoryText;
+    @BindView(R.id.button_add_recipe) FloatingActionButton addRecipeButton;
+    @BindView(R.id.text_add_recipe) TextView addRecipeText;
     @BindView(R.id.tabs) TabLayout tabLayout;
     @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.container) ViewPager viewPager;
 
-    private MainViewModel viewModel;
+    private AlertDialog addCategoryDialog;
     private List<Category> categories;
-    private List<Recipe> recipes;
-    private Category editedCategory;
     private AlertDialog deleteCategoryDialog;
+    private AlertDialog deleteRecipeDialog;
     private AlertDialog editCategoryDialog;
+    private Category editedCategory;
+    private Recipe editedRecipe;
+    private boolean isFabOpen = false;
+    private Animation fabClose;
+    private Animation fabOpen;
+    private List<Recipe> recipes;
+    private Animation rotateBackward;
+    private Animation rotateForward;
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +88,17 @@ public class MainActivity extends AppCompatActivity implements
 
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        viewPager.setAdapter(mSectionsPagerAdapter);
 
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
 
+        buildCreateCategoryDialog();
         buildDeleteCategoryDialog();
+        buildDeleteRecipeDialog();
         buildEditCategoryDialog();
         checkFirstRun();
+        getAnimations();
     }
 
     @Override
@@ -85,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
@@ -98,7 +120,11 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // TODO: search filter
+                viewPager.setCurrentItem(0);
+                Intent recipeFilterIntent = new Intent(FILTER_RECIPE_ACTION);
+                recipeFilterIntent.putExtra("filter", newText);
+                LocalBroadcastManager.getInstance(getBaseContext())
+                        .sendBroadcast(recipeFilterIntent);
                 return false;
             }
         });
@@ -112,14 +138,18 @@ public class MainActivity extends AppCompatActivity implements
         switch (requestCode) {
             case REQUEST_ADD_RECIPE:
                 if (resultCode == RESULT_OK) {
+                    /*
                     Snackbar.make(toolbar, R.string.alert_recipe_saved, Snackbar.LENGTH_LONG)
                             .show();
+                    */
                 }
                 break;
             case REQUEST_VIEW_RECIPE:
                 if (resultCode == RESULT_OK) {
+                    /*
                     Snackbar.make(toolbar, R.string.alert_recipe_deleted, Snackbar.LENGTH_LONG)
                             .show();
+                    */
                 }
                 break;
             case IntroductionBuilder.INTRODUCTION_REQUEST_CODE:
@@ -152,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements
         int id = item.getItemId();
         switch (id) {
             case R.id.action_search:
-                // TODO: search widget
+                viewPager.setCurrentItem(0);
                 break;
             case R.id.action_about:
                 startActivity(new Intent(this, AboutActivity.class));
@@ -181,6 +211,49 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onRecipeEdit(Recipe recipe) {
+        Intent intent = new Intent(this, EditRecipeActivity.class);
+        intent.putExtra("recipe", recipe);
+        startActivityForResult(intent, REQUEST_EDIT_RECIPE);
+    }
+
+    @Override
+    public void onRecipeEdit(String name) {
+        Recipe recipe = null;
+        for (Recipe r : recipes) {
+            if (r.getName().equals(name)) {
+                recipe = r;
+                break;
+            }
+        }
+        if (recipe != null) {
+            Intent intent = new Intent(this, EditRecipeActivity.class);
+            intent.putExtra("recipe", recipe);
+            startActivityForResult(intent, REQUEST_EDIT_RECIPE);
+        }
+    }
+
+    @Override
+    public void onRecipeDelete(Recipe recipe) {
+        editedRecipe = recipe;
+        deleteRecipeDialog.show();
+    }
+
+    @Override
+    public void onRecipeDelete(String name) {
+        Recipe recipe = null;
+        for (Recipe r : recipes) {
+            if (r.getName().equals(name)) {
+                recipe = r;
+                break;
+            }
+        }
+        if (recipe != null) {
+            onRecipeDelete(recipe);
+        }
+    }
+
+    @Override
     public void onRecipeSelected(Recipe recipe) {
         Intent intent = new Intent(this, ViewRecipeActivity.class);
         intent.putExtra("recipe", recipe);
@@ -197,16 +270,132 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
         if (recipe != null) {
-            Intent intent = new Intent(this, ViewRecipeActivity.class);
-            intent.putExtra("recipe", recipe);
-            startActivityForResult(intent, REQUEST_VIEW_RECIPE);
+            onRecipeSelected(recipe);
         }
+    }
+
+    @Override
+    public void onRecipeShare(Recipe recipe) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(recipe.getName());
+        builder.append("\n");
+        builder.append("\n");
+        if (recipe.getCategoryId() != null) {
+            for (Category c : categories) {
+                if (c.getId().equals(recipe.getCategoryId())) {
+                    builder.append(c.getName());
+                    builder.append("\n");
+                    builder.append("\n");
+                }
+            }
+        }
+        for (String ingredient : recipe.getIngredients()) {
+            builder.append(ingredient);
+            builder.append("\n");
+        }
+        builder.append("\n");
+        builder.append("\n");
+        builder.append(recipe.getInstructions());
+        String shareableRecipe = builder.toString();
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_TEXT, shareableRecipe);
+        intent.setType("text/plain");
+        String title = getResources().getString(R.string.action_share);
+        Intent chooser = Intent.createChooser(intent, title);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(chooser);
+        }
+    }
+
+    @Override
+    public void onRecipeShare(String name) {
+        Recipe recipe = null;
+        for (Recipe r : recipes) {
+            if (r.getName().equals(name)) {
+                recipe = r;
+                break;
+            }
+        }
+        if (recipe != null) {
+            onRecipeShare(recipe);
+        }
+    }
+
+    @OnClick(R.id.button_add)
+    void toggleButtons() {
+        if(isFabOpen){
+            addButton.startAnimation(rotateBackward);
+            addRecipeText.startAnimation(fabClose);
+            addCategoryText.startAnimation(fabClose);
+            addRecipeButton.startAnimation(fabClose);
+            addCategoryButton.startAnimation(fabClose);
+            addRecipeButton.setClickable(false);
+            addCategoryButton.setClickable(false);
+            isFabOpen = false;
+        } else {
+            addButton.startAnimation(rotateForward);
+            addRecipeText.startAnimation(fabOpen);
+            addCategoryText.startAnimation(fabOpen);
+            addRecipeButton.startAnimation(fabOpen);
+            addCategoryButton.startAnimation(fabOpen);
+            addRecipeButton.setClickable(true);
+            addCategoryButton.setClickable(true);
+            isFabOpen = true;
+        }
+    }
+
+    @OnClick(R.id.button_add_category)
+    void addCategory() {
+        toggleButtons();
+        editCategoryDialog.dismiss();
+        deleteCategoryDialog.dismiss();
+        addCategoryDialog.show();
     }
 
     @OnClick(R.id.button_add_recipe)
     void addRecipe() {
+        toggleButtons();
         startActivityForResult(new Intent(this, CreateRecipeActivity.class),
                 REQUEST_ADD_RECIPE);
+    }
+
+
+    @SuppressLint("InflateParams")
+    private void buildCreateCategoryDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View createDialogView = getLayoutInflater().inflate(R.layout.dialog_create_category, null);
+        addCategoryDialog = builder.setView(createDialogView)
+                .setTitle(R.string.title_create_category)
+                .setPositiveButton(R.string.action_save, (dialog, which) -> {
+                    String categoryName = ((EditText) createDialogView
+                            .findViewById(R.id.edit_category_name)).getText().toString().trim();
+                    if (categoryName.length() == 0) {
+                        Snackbar.make(toolbar, R.string.alert_blank_category_name,
+                                Snackbar.LENGTH_LONG).show();
+                    } else {
+                        // Check for duplicate category
+                        boolean duplicateFound = false;
+                        for (Category c : categories) {
+                            if (c.getName().toLowerCase().equals(categoryName.toLowerCase())) {
+                                duplicateFound = true;
+                                Snackbar.make(toolbar, R.string.category_name_duplicate,
+                                        Snackbar.LENGTH_LONG).show();
+                                break;
+                            }
+                        }
+                        if (!duplicateFound) {
+                            viewModel.insertCategory(new Category(categoryName));
+                            /*
+                            Snackbar.make(toolbar, R.string.alert_category_saved,
+                                    Snackbar.LENGTH_LONG).show();
+                            */
+                        }
+                    }
+                    ((EditText) createDialogView.findViewById(R.id.edit_category_name)).setText("");
+                }).setNegativeButton(R.string.cancel, (dialog, which) -> {
+                    // Canceled, do nothing
+                }).create();
     }
 
     private void buildDeleteCategoryDialog() {
@@ -218,7 +407,16 @@ public class MainActivity extends AppCompatActivity implements
                     // Do nothing
                 });
         deleteCategoryDialog = builder.create();
+    }
 
+    private void buildDeleteRecipeDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.alert_delete_recipe);
+        builder.setPositiveButton(R.string.yes, (dialog, id) -> viewModel.deleteRecipe(editedRecipe));
+        builder.setNegativeButton(R.string.cancel, (dialog, d) -> {
+            // 'Cancel' selected, do nothing
+        });
+        deleteRecipeDialog = builder.create();
     }
 
     @SuppressLint("InflateParams")
@@ -247,8 +445,10 @@ public class MainActivity extends AppCompatActivity implements
                         if (!duplicateFound) {
                             editedCategory.setName(categoryName);
                             viewModel.updateCategory(editedCategory);
+                            /*
                             Snackbar.make(toolbar, R.string.alert_category_saved,
                                     Snackbar.LENGTH_LONG).show();
+                            */
                         }
                     }
                     ((EditText) dialogView.findViewById(R.id.edit_category_name)).setText("");
@@ -294,6 +494,13 @@ public class MainActivity extends AppCompatActivity implements
         );
 
         return result;
+    }
+
+    private void getAnimations() {
+        fabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        fabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
+        rotateForward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_forward);
+        rotateBackward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_backward);
     }
 
     private void observe() {

@@ -119,9 +119,11 @@
     <string name="tab_text_1">Recipes</string>
     <string name="tab_text_3">Categories</string>
     <string name="tab_text_2">Favorites</string>
+    <string name="action_delete_category">Delete category</string>
+    <string name="action_create_recipe">Create a recipe</string>
+    <string name="action_create_category">Create a category</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 

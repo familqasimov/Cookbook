@@ -31,8 +31,20 @@ public class MainViewModel extends AndroidViewModel {
         recipes = dataRepository.getRecipes();
     }
 
+    void deleteAllCategories() {
+        dataRepository.deleteAllCategories();
+    }
+
+    void deleteAllRecipes() {
+        dataRepository.deleteAllRecipes();
+    }
+
     void deleteCategory(Category category) {
         dataRepository.deleteCategory(category);
+    }
+
+    void deleteRecipe(Recipe recipe) {
+        dataRepository.deleteRecipe(recipe);
     }
 
     LiveData<List<Category>> getCategories() {
@@ -41,14 +53,6 @@ public class MainViewModel extends AndroidViewModel {
 
     LiveData<List<CombineDao.combinedRecipe>> getCombinedRecipes() {
         return combinedRecipes;
-    }
-
-    void deleteAllCategories() {
-        dataRepository.deleteAllCategories();
-    }
-
-    void deleteAllRecipes() {
-        dataRepository.deleteAllRecipes();
     }
 
     LiveData<List<CombineDao.combinedRecipe>> getFavoriteCombinedRecipes() {
@@ -61,6 +65,10 @@ public class MainViewModel extends AndroidViewModel {
 
     LiveData<List<Recipe>> getRecipes() {
         return recipes;
+    }
+
+    void insertCategory(Category category) {
+        dataRepository.insertCategory(category);
     }
 
     void updateCategory(Category category) {

@@ -6,9 +6,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,11 +28,13 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 public class FavoriteRecipesFragment extends Fragment {
-    private AllRecipesFragment.OnRecipeSelectedListener mListener;
-    private List<Recipe> recipes;
+    private static final String TAG = FavoriteRecipesFragment.class.getSimpleName();
+
     private List<CombineDao.combinedRecipe> combinedRecipes;
+    private AllRecipesFragment.RecipeFragmentListener listener;
     private TextView noFavoritesText;
     private ListView recipeList;
+    private List<Recipe> favoriteRecipes;
 
     public FavoriteRecipesFragment() {
     }
@@ -54,32 +61,43 @@ public class FavoriteRecipesFragment extends Fragment {
         noFavoritesText = view.findViewById(R.id.text_no_favorites);
         recipeList = view.findViewById(R.id.list_favorites);
         recipeList.setOnItemClickListener((parent, view1, position, id) -> {
-            if (mListener != null) {
+            if (listener != null) {
                 CombineDao.combinedRecipe combined = combinedRecipes.get(position);
-                if (recipes != null) {
+                if (favoriteRecipes != null) {
                     Recipe foundRecipe = null;
-                    for (Recipe recipe : recipes) {
+                    for (Recipe recipe : favoriteRecipes) {
                         if (recipe.getName().equals(combined.recipeName)) {
                             foundRecipe = recipe;
                             break;
                         }
                     }
                     if (foundRecipe != null) {
-                        mListener.onRecipeSelected(foundRecipe);
+                        listener.onRecipeSelected(foundRecipe);
                     }
                 }
             }
         });
+
+        registerForContextMenu(recipeList);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        //noinspection ConstantConditions
+        MenuInflater menuInflater = getActivity().getMenuInflater();
+        menuInflater.inflate(R.menu.context_menu_recipe, menu);
+        Log.e(TAG, "onCreateContextMenu");
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof AllRecipesFragment.OnRecipeSelectedListener) {
-            mListener = (AllRecipesFragment.OnRecipeSelectedListener) context;
+        if (context instanceof AllRecipesFragment.RecipeFragmentListener) {
+            listener = (AllRecipesFragment.RecipeFragmentListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnRecipeSelectedListener");
+                    + " must implement RecipeFragmentListener");
         }
     }
 
@@ -92,12 +110,35 @@ public class FavoriteRecipesFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (getUserVisibleHint()) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            Recipe selectedRecipe = favoriteRecipes.get(info.position);
+            switch (item.getItemId()) {
+                case R.id.action_edit_recipe:
+                    listener.onRecipeEdit(selectedRecipe);
+                    return true;
+                case R.id.action_share:
+                    listener.onRecipeShare(selectedRecipe);
+                    return true;
+                case R.id.action_delete_recipe:
+                    listener.onRecipeDelete(selectedRecipe);
+                    return true;
+                default:
+                    return super.onContextItemSelected(item);
+            }
+        }
+        return false;
     }
 
     private void observe() {
+        //noinspection ConstantConditions
         MainViewModel viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        viewModel.getFavoriteRecipes().observe(this, data -> recipes = data);
+        viewModel.getFavoriteRecipes().observe(this, data -> favoriteRecipes = Utils.sortRecipesByName(data));
         viewModel.getFavoriteCombinedRecipes().observe(this, data -> {
             if (data == null || data.size() == 0) {
                 noFavoritesText.setVisibility(VISIBLE);

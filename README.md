@@ -3,15 +3,13 @@
 * Optionally assign categories to recipes
 * Create & edit categories
 * Favorite recipes
-* Sort recipes alphabetically by recipe name or category
 * Search created recipes
-* Filter recipes by a specific category
 * Uses Room persistence library to save recipes & categories to a local database
 * Doesn't require any permissions
 
 ## Screengrabs
 
-![cookbook](images/grabs5.png)
+![cookbook](images/grabs6.png)
 
 ## Credits
 * [Android Asset Studio](https://github.com/romannurik/AndroidAssetStudio) - Roman Nurik
@@ -27,7 +25,6 @@
   * [Support v4](https://developer.android.com/topic/libraries/support-library/packages.html#v4)
   * [Testing Support Library](https://developer.android.com/topic/libraries/testing-support-library/index.html)
 * [Butter Knife](https://github.com/JakeWharton/butterknife) - Jake Wharton
-* [DroidParts ClearableEditText](https://github.com/droidparts/droidparts/blob/master/droidparts-misc/src/org/droidparts/widget/ClearableEditText.java) - Alex Yanchenko
 * [Google Open Source Notices Gradle Plugin](https://developers.google.com/android/guides/opensource) - Google
 * [Introduction](https://github.com/RubenGees/Introduction) - Ruben Gees
 

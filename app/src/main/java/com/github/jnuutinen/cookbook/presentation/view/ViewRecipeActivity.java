@@ -17,15 +17,13 @@ import com.github.jnuutinen.cookbook.R;
 import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 import com.github.jnuutinen.cookbook.presentation.edit.EditRecipeActivity;
-
-import java.util.List;
+import com.github.jnuutinen.cookbook.presentation.main.MainActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class ViewRecipeActivity extends AppCompatActivity {
-    private static final int REQUEST_EDIT_RECIPE = 1;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.button_favorite) FloatingActionButton favoriteButton;
@@ -33,8 +31,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
     @BindView(R.id.text_view_ingredients) TextView ingredients;
     @BindView(R.id.text_view_instructions) TextView instructions;
 
-    private AlertDialog deleteDialog;
-    private List<CombineDao.combinedRecipe> liveCombinedRecipes;
+    private AlertDialog deleteRecipeDialog;
     private Recipe recipe;
     private ViewRecipeViewModel viewModel;
 
@@ -48,7 +45,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         viewModel = ViewModelProviders.of(this).get(ViewRecipeViewModel.class);
 
-        buildDeleteDialog();
+        buildDeleteRecipeDialog();
         //noinspection ConstantConditions
         recipe = getIntent().getParcelableExtra("recipe");
         observe();
@@ -81,7 +78,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case REQUEST_EDIT_RECIPE:
+            case MainActivity.REQUEST_EDIT_RECIPE:
                 if (resultCode == RESULT_OK) {
                     Snackbar.make(category, R.string.alert_recipe_saved, Snackbar.LENGTH_LONG).show();
                 }
@@ -95,14 +92,14 @@ public class ViewRecipeActivity extends AppCompatActivity {
         switch (item.getItemId()) {
 
             case R.id.action_delete_recipe:
-                deleteDialog.show();
+                deleteRecipeDialog.show();
                 return true;
 
             case R.id.action_edit_recipe:
                 viewModel.cacheRecipe(recipe);
                 Intent intent = new Intent(this, EditRecipeActivity.class);
                 intent.putExtra("recipe", recipe);
-                startActivityForResult(intent, REQUEST_EDIT_RECIPE);
+                startActivityForResult(intent, MainActivity.REQUEST_EDIT_RECIPE);
                 return true;
             case R.id.action_share:
                 shareRecipe();
@@ -124,7 +121,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
         viewModel.updateRecipe(recipe);
     }
 
-    private void buildDeleteDialog() {
+    private void buildDeleteRecipeDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.alert_delete_recipe);
         builder.setPositiveButton(R.string.yes, (dialog, id) -> {
@@ -135,7 +132,7 @@ public class ViewRecipeActivity extends AppCompatActivity {
         builder.setNegativeButton(R.string.cancel, (dialog, d) -> {
             // 'Cancel' selected, do nothing
         });
-        deleteDialog = builder.create();
+        deleteRecipeDialog = builder.create();
     }
 
     private void getRecipe() {
@@ -152,7 +149,6 @@ public class ViewRecipeActivity extends AppCompatActivity {
 
     private void observe() {
         viewModel.getCombinedRecipes().observe(this, liveCombinedRecipes -> {
-            this.liveCombinedRecipes = liveCombinedRecipes;
             if (liveCombinedRecipes != null) {
                 for (CombineDao.combinedRecipe combined : liveCombinedRecipes) {
                     if (combined.recipeName.equals(recipe.getName())) {

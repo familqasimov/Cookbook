@@ -2,6 +2,7 @@ package com.github.jnuutinen.cookbook.presentation;
 
 import com.github.jnuutinen.cookbook.data.db.dao.CombineDao;
 import com.github.jnuutinen.cookbook.data.db.entity.Category;
+import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -60,9 +61,23 @@ public class Utils {
             final String name2 = entry2.recipeName;
             return name1.compareToIgnoreCase(name2);
         };
-        // category order comparator
-        // Sort by name first
         Collections.sort(list, nameOrder);
         return list;
+    }
+
+    /**
+     * Sorts a Recipe list by recipe name
+     * @param list List to be sorted
+     * @return The sorted list
+     */
+    public static List<Recipe> sortRecipesByName(List<Recipe> list) {
+        Comparator<Recipe> nameOrder = (entry1, entry2) -> {
+            final String name1 = entry1.getName();
+            final String name2 = entry2.getName();
+            return name1.compareToIgnoreCase(name2);
+        };
+        Collections.sort(list, nameOrder);
+        return list;
+
     }
 }

@@ -66,4 +66,7 @@
     <string name="tab_text_1">Reseptit</string>
     <string name="tab_text_2">Suosikit</string>
     <string name="tab_text_3">Kategoriat</string>
+    <string name="action_delete_category">Poista kategoria</string>
+    <string name="action_create_recipe">Luo resepti</string>
+    <string name="action_create_category">Luo kategoria</string>
 </resources>

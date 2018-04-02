@@ -31,9 +31,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-// TODO: cache unsaved recipe?
 public class CreateRecipeActivity extends AppCompatActivity {
-    //private static final String TAG = CreateRecipeActivity.class.getSimpleName();
     public static final String STATE_NAME = "name";
     public static final String STATE_INGREDIENTS = "ingredients";
     public static final String STATE_INSTRUCTIONS = "instructions";
@@ -97,7 +95,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         getRecipeInfo();
         savedInstanceState.putString(STATE_NAME, name);
-        // TODO: persist category selection
         savedInstanceState.putStringArrayList(STATE_INGREDIENTS, ingredients);
         savedInstanceState.putString(STATE_INSTRUCTIONS, instructions);
         super.onSaveInstanceState(savedInstanceState);

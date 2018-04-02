@@ -6,7 +6,7 @@
         android:id="@+id/action_edit_recipe"
         android:icon="@drawable/ic_action_edit"
         android:title="@string/action_edit_recipe"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_share"

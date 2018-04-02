@@ -3,7 +3,6 @@ package com.github.jnuutinen.cookbook.presentation.edit;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,7 +36,6 @@ import static com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActi
 import static com.github.jnuutinen.cookbook.presentation.create.CreateRecipeActivity.STATE_NAME;
 
 public class EditRecipeActivity extends AppCompatActivity {
-    private static final String TAG = EditRecipeActivity.class.getSimpleName();
 
     private final String PREFS_NAME = "com.github.jnuutinen.cookbook";
     private final String PREF_INGREDIENT_DELETE_DISMISS = "ingredient_delete_dismiss";
@@ -104,7 +101,6 @@ public class EditRecipeActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         getRecipeInfo();
         savedInstanceState.putString(STATE_NAME, name);
-        // TODO: persist category selection
         savedInstanceState.putStringArrayList(STATE_INGREDIENTS, ingredients);
         savedInstanceState.putString(STATE_INSTRUCTIONS, instructions);
         super.onSaveInstanceState(savedInstanceState);
@@ -162,14 +158,11 @@ public class EditRecipeActivity extends AppCompatActivity {
         @SuppressLint("InflateParams") View view = getLayoutInflater().inflate(R.layout.dialog_delete_ingredient, null);
         builder.setView(view).setTitle(R.string.title_delete_ingredient)
                 .setMessage(R.string.alert_delete_ingredient)
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (((CheckBox)view.findViewById(R.id.checkbox_dont_show_dialog)).isChecked()) {
-                            EditRecipeActivity.this.writePrefs();
-                        }
-                        EditRecipeActivity.this.removeRow();
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    if (((CheckBox)view.findViewById(R.id.checkbox_dont_show_dialog)).isChecked()) {
+                        EditRecipeActivity.this.writePrefs();
                     }
+                    EditRecipeActivity.this.removeRow();
                 }).setNegativeButton(R.string.cancel, (dialog, which) -> {
             // Cancel, do nothing
         });
@@ -301,7 +294,6 @@ public class EditRecipeActivity extends AppCompatActivity {
     }
 
     private void writePrefs() {
-        Log.e(TAG, "writeprefs");
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         prefs.edit().putBoolean(PREF_INGREDIENT_DELETE_DISMISS, true).apply();
         ingredientAlertDismissed = true;

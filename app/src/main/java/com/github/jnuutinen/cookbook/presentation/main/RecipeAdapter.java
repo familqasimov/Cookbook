@@ -22,7 +22,7 @@ public class RecipeAdapter extends ArrayAdapter<CombineDao.combinedRecipe> imple
     private List<CombineDao.combinedRecipe> filtered;
     private ItemFilter filter = new ItemFilter();
 
-    public RecipeAdapter(Context context, List<CombineDao.combinedRecipe> recipes) {
+    RecipeAdapter(Context context, List<CombineDao.combinedRecipe> recipes) {
         super(context, 0, recipes);
         combinedRecipes = recipes;
         filtered = recipes;

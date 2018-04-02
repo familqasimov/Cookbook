@@ -7,10 +7,8 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
-import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 
 import com.github.jnuutinen.cookbook.AppExecutors;
 import com.github.jnuutinen.cookbook.data.db.converter.ListConverter;
@@ -22,7 +20,7 @@ import com.github.jnuutinen.cookbook.data.db.entity.Recipe;
 
 import java.util.List;
 
-@Database(entities = {Recipe.class, Category.class}, version = 2, exportSchema = false)
+@Database(entities = {Recipe.class, Category.class}, version = 1, exportSchema = false)
 @TypeConverters({ListConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DB_NAME = "cookbook_db";
@@ -30,14 +28,6 @@ public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase instance;
     private static AppExecutors executors;
     private final MutableLiveData<Boolean> isDatabaseCreated = new MutableLiveData<>();
-
-    private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE Recipe ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0");
-        }
-    };
-
 
     public static AppDatabase getInstance(final Context context, final AppExecutors appExecutors) {
         if (instance == null) {
@@ -54,7 +44,6 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase buildDatabase(final Context appContext) {
         return Room.databaseBuilder(appContext, AppDatabase.class, DB_NAME)
-                .addMigrations(MIGRATION_1_2)
                 .addCallback(new Callback() {
                     @Override
                     public void onCreate(@NonNull SupportSQLiteDatabase db) {
@@ -82,14 +71,10 @@ public abstract class AppDatabase extends RoomDatabase {
         database.runInTransaction(() -> database.recipeDao().insertAll(recipes));
     }
 
-
-    @VisibleForTesting
     public abstract RecipeDao recipeDao();
 
-    @VisibleForTesting
     public abstract CategoryDao categoryDao();
 
-    @VisibleForTesting
     public abstract CombineDao combineDao();
 
     public LiveData<Boolean> getDatabaseCreated() {

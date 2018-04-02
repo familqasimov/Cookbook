@@ -47,7 +47,6 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements
         AllRecipesFragment.RecipeFragmentListener {
-    //private static final String TAG = MainActivity.class.getSimpleName();
     public static final String FILTER_RECIPE_ACTION = "com.github.jnuutinen.cookbook.FILTER_RECIPE";
     private static final int REQUEST_ADD_RECIPE = 1;
     public static final int REQUEST_EDIT_RECIPE = 2;
@@ -373,6 +372,10 @@ public class MainActivity extends AppCompatActivity implements
                     if (categoryName.length() == 0) {
                         Snackbar.make(toolbar, R.string.alert_blank_category_name,
                                 Snackbar.LENGTH_LONG).show();
+                    } else if (categoryName.toLowerCase().equals("no category") || categoryName
+                            .toLowerCase().equals("ei kategoriaa")) {
+                        Snackbar.make(toolbar, R.string.category_name_invalid, Snackbar.LENGTH_LONG)
+                                .show();
                     } else {
                         // Check for duplicate category
                         boolean duplicateFound = false;

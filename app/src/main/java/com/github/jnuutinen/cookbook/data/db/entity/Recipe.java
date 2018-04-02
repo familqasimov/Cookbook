@@ -32,10 +32,9 @@ public class Recipe implements Parcelable {
     private List<String> ingredients;
     private String instructions;
     @ColumnInfo(name = "is_favorite")
-    private int isFavorite;
+    private int isFavorite = 0;
 
-    public Recipe() {
-    }
+    public Recipe() {}
 
     @Ignore
     public Recipe(String name, Integer categoryId, List<String> ingredients, String instructions) {

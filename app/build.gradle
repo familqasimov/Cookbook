@@ -8,7 +8,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "0.3.0"
+        versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -32,7 +32,7 @@ dependencies {
     implementation 'com.android.support:design:27.1.0'
 
     // OSS libs licenses
-    implementation 'com.google.android.gms:play-services-oss-licenses:11.8.0'
+    implementation 'com.google.android.gms:play-services-oss-licenses:12.0.1'
 
     // JUnit test dependencies
     implementation 'com.android.support:support-v4:27.1.0'
@@ -50,10 +50,10 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.2'
 
     // ViewModel and LiveData
-    implementation 'android.arch.lifecycle:extensions:1.1.0'
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
 
     // Test helpers for LiveData
-    testImplementation "android.arch.core:core-testing:1.1.0"
+    testImplementation "android.arch.core:core-testing:1.1.1"
 
     // Butterknife
     compile 'com.jakewharton:butterknife:8.8.1'

@@ -19,12 +19,6 @@ public interface CategoryDao {
     @Query("SELECT * FROM Category")
     List<Category> getAll();
 
-    @Query("SELECT * FROM Category WHERE id = :id")
-    Category getById(Integer id);
-
-    @Query("SELECT * FROM Category WHERE name = :name")
-    Category getByName(String name);
-
     @Delete
     void delete(Category category);
 

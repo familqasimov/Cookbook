@@ -9,7 +9,7 @@
 
 ## Screengrabs
 
-![cookbook](images/grabs6.png)
+![cookbook](images/grabs.png)
 
 ## Credits
 * [Android Asset Studio](https://github.com/romannurik/AndroidAssetStudio) - Roman Nurik

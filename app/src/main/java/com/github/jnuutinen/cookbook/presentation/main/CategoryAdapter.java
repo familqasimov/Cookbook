@@ -72,10 +72,17 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.item_category_group, null);
+            if (layoutInflater != null) {
+                convertView = layoutInflater.inflate(R.layout.item_category_group, null);
+            }
         }
-        TextView categoryText = convertView.findViewById(R.id.text_category_group);
-        categoryText.setText(groupString);
+        TextView categoryText = null;
+        if (convertView != null) {
+            categoryText = convertView.findViewById(R.id.text_category_group);
+        }
+        if (categoryText != null) {
+            categoryText.setText(groupString);
+        }
         return convertView;
     }
 
@@ -87,10 +94,17 @@ public class CategoryAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.item_exp_recipe, null);
+            if (layoutInflater != null) {
+                convertView = layoutInflater.inflate(R.layout.item_exp_recipe, null);
+            }
         }
-        TextView recipeText = convertView.findViewById(R.id.text_expanded_recipe);
-        recipeText.setText(childString);
+        TextView recipeText = null;
+        if (convertView != null) {
+            recipeText = convertView.findViewById(R.id.text_expanded_recipe);
+        }
+        if (recipeText != null) {
+            recipeText.setText(childString);
+        }
         return convertView;
     }
 

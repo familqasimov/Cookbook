@@ -31,7 +31,6 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 public class AllRecipesFragment extends Fragment {
-    private static final String TAG = AllRecipesFragment.class.getSimpleName();
 
     private RecipeAdapter adapter;
     private List<CombineDao.combinedRecipe> combinedRecipes;

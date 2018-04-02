@@ -12,8 +12,7 @@ public class Category implements Parcelable {
     private Integer id;
     private String name;
 
-    public Category() {
-    }
+    public Category() {}
 
     @Ignore
     public Category(String name) {

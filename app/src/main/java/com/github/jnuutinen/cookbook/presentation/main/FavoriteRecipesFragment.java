@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -28,7 +27,6 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 public class FavoriteRecipesFragment extends Fragment {
-    private static final String TAG = FavoriteRecipesFragment.class.getSimpleName();
 
     private List<CombineDao.combinedRecipe> combinedRecipes;
     private AllRecipesFragment.RecipeFragmentListener listener;
@@ -87,7 +85,6 @@ public class FavoriteRecipesFragment extends Fragment {
         //noinspection ConstantConditions
         MenuInflater menuInflater = getActivity().getMenuInflater();
         menuInflater.inflate(R.menu.context_menu_recipe, menu);
-        Log.e(TAG, "onCreateContextMenu");
     }
 
     @Override

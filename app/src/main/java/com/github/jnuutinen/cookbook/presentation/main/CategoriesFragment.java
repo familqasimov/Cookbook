@@ -24,12 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 public class CategoriesFragment extends Fragment {
-    private static final String TAG = CategoriesFragment.class.getSimpleName();
 
     private List<Category> categories;
     private CategoryAdapter adapter;
     private ExpandableListView categoryList;
-    private List<CombineDao.combinedRecipe> combinedRecipes;
     private AllRecipesFragment.RecipeFragmentListener listener;
     private TextView noCategoriesText;
     private List<String> stringCategories;
@@ -176,7 +174,6 @@ public class CategoriesFragment extends Fragment {
         viewModel.getCategories().observe(this, data -> categories = data);
 
         viewModel.getCombinedRecipes().observe(this, data -> {
-            combinedRecipes = data;
             if (data == null || data.size() == 0) {
                 noCategoriesText.setVisibility(View.VISIBLE);
             } else {
@@ -186,7 +183,9 @@ public class CategoriesFragment extends Fragment {
             for (Category c : categories) {
                 stringCategories.add(c.getName());
             }
-            stringCategories.add(getResources().getString(R.string.recipe_no_category));
+            if (data != null && data.size() > 0) {
+                stringCategories.add(getResources().getString(R.string.recipe_no_category));
+            }
             Map<String, List<String>> categoryMap = new HashMap<>();
             String noCategory = getResources().getString(R.string.recipe_no_category);
             if (data != null) {

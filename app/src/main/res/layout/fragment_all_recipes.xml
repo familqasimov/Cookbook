@@ -9,7 +9,8 @@
         android:id="@+id/text_no_recipes"
         android:text="@string/title_no_recipes"
         android:visibility="gone"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:padding="8dp"/>
 
     <ListView
         android:id="@+id/list_recipes"

@@ -9,7 +9,8 @@
         android:id="@+id/text_no_categories"
         android:text="@string/title_no_categories"
         android:visibility="gone"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:padding="8dp"/>
 
     <ExpandableListView
         android:id="@+id/list_categories"

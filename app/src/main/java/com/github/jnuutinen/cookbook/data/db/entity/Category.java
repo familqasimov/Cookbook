@@ -20,6 +20,12 @@ public class Category implements Parcelable {
     }
 
     @Ignore
+    public Category(Integer id, String name) {
+        this.name = name;
+        this.id = id;
+    }
+
+    @Ignore
     private Category(Parcel in) {
         id = in.readInt();
         name = in.readString();

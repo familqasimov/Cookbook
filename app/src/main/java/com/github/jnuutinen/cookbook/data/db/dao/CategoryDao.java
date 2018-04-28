@@ -14,10 +14,7 @@ import java.util.List;
 @Dao
 public interface CategoryDao {
     @Query("SELECT * FROM Category")
-    LiveData<List<Category>> liveGetAll();
-
-    @Query("SELECT * FROM Category")
-    List<Category> getAll();
+    LiveData<List<Category>> getAll();
 
     @Delete
     void delete(Category category);

@@ -51,7 +51,7 @@ public abstract class AppDatabase extends RoomDatabase {
                         executors.diskIo().execute(() -> {
                             AppDatabase database = AppDatabase.getInstance(appContext, executors);
                             List<Category> categories = DataGenerator.generateCategories();
-                            categories = insertCategories(database, categories);
+                            insertCategories(database, categories);
                             List<Recipe> recipes = DataGenerator.generateRecipes(categories);
                             insertRecipes(database, recipes);
                             database.setDatabaseCreated();
@@ -60,10 +60,9 @@ public abstract class AppDatabase extends RoomDatabase {
                 }).build();
     }
 
-    private static List<Category> insertCategories(final AppDatabase database,
-                                                   final List<Category> categories) {
+    private static void insertCategories(final AppDatabase database,
+                                         final List<Category> categories) {
         database.runInTransaction(() -> database.categoryDao().insertAll(categories));
-        return database.categoryDao().getAll();
     }
 
     private static void insertRecipes(final AppDatabase database,
@@ -112,7 +111,7 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     public LiveData<List<Category>> getCategories() {
-        return categoryDao().liveGetAll();
+        return categoryDao().getAll();
     }
 
     public LiveData<List<CombineDao.combinedRecipe>> getFavoriteCombinedRecipes() {

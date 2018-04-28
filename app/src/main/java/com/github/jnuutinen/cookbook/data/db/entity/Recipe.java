@@ -45,6 +45,17 @@ public class Recipe implements Parcelable {
         isFavorite = 0;
     }
 
+    @Ignore
+    public Recipe(Integer id, String name, Integer categoryId, List<String> ingredients,
+                  String instructions, int isFavorite) {
+        this.id = id;
+        this.name = name;
+        this.categoryId = categoryId;
+        this.ingredients = ingredients;
+        this.instructions = instructions;
+        this.isFavorite = isFavorite;
+    }
+
     @SuppressLint("ParcelClassLoader")
     @Ignore
     private Recipe(Parcel in) {

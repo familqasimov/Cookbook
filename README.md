@@ -1,3 +1,5 @@
+<p align="center"><img src="logo/logo.png" alt="CookBook" height="200px"></p>
+
 ## Features
 * Create & edit recipes
 * Optionally assign categories to recipes

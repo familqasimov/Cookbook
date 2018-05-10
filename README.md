@@ -1,4 +1,4 @@
-<p align="center"><img src="logo/logo.png" alt="CookBook" height="200px"></p>
+<p align="center"><img src="logo-bar/logo.png" alt="CookBook" height="200px"></p>
 
 ## Features
 * Create & edit recipes
